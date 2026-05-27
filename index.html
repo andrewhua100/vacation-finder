@@ -781,7 +781,7 @@ const CITY_SEARCH_TERMS = {
   "Savannah":       "Savannah Georgia Spanish moss oak trees squares",
   "Asheville":      "Asheville North Carolina Blue Ridge Parkway mountains",
   "Charlotte":      "Charlotte North Carolina skyline uptown",
-  "New York":       "New York City Manhattan skyline Central Park",
+  "New York":       "New York City Manhattan skyline Times Square",
   "Philadelphia":   "Philadelphia skyline Liberty Bell Independence Hall",
   "Washington DC":  "Washington DC Capitol Mall monuments",
   "Baltimore":      "Baltimore Inner Harbor skyline Maryland",
@@ -969,7 +969,7 @@ const tooltip = document.getElementById('tooltip');
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 function showTooltip(event, d) {
-  document.getElementById('tt-name').textContent = d.name;
+  document.getElementById('tt-name').textContent = d.name === 'New York' ? 'New York City' : d.name;
   document.getElementById('tt-state').textContent = d.state;
 
   // Show placeholder while loading
