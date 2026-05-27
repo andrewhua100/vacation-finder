@@ -449,7 +449,7 @@ const lonLat = {
   "Tampa":[-82.46,27.95],"Key West":[-81.78,24.55],"New Orleans":[-90.07,29.95],
   "Nashville":[-86.78,36.17],"Memphis":[-90.05,35.15],"Atlanta":[-84.39,33.75],
   "Charleston":[-79.94,32.78],"Savannah":[-81.10,32.08],"Asheville":[-82.55,35.57],
-  "Charlotte":[-80.84,35.23],"New York":[-74.01,40.71],"Philadelphia":[-75.16,39.95],
+  "Charlotte":[-80.84,35.23],"New York City":[-74.01,40.71],"Philadelphia":[-75.16,39.95],
   "Washington DC":[-77.04,38.91],"Baltimore":[-76.61,39.29],"Boston":[-71.06,42.36],
   "Portland ME":[-70.26,43.66],"Burlington":[-73.21,44.48],"Pittsburgh":[-79.99,40.44],
   "Bend":[-121.31,44.06],"Honolulu":[-157.83,21.31],"Maui":[-156.33,20.80],
@@ -491,7 +491,7 @@ const LABEL_OFFSETS = {
   "Washington DC":[-6, -7,  'l'],
   "Baltimore":    [7,   9,  'r'],
   "Philadelphia": [-6, -7,  'l'],
-  "New York":     [7,  -7,  'r'],
+  "New York City":     [7,  -7,  'r'],
   "Pittsburgh":   [-6, -7,  'l'],
   "Charlotte":    [7,  -7,  'r'],
   "Asheville":    [-6,  9,  'l'],
@@ -781,7 +781,7 @@ const CITY_SEARCH_TERMS = {
   "Savannah":       "Savannah Georgia Spanish moss oak trees squares",
   "Asheville":      "Asheville North Carolina Blue Ridge Parkway mountains",
   "Charlotte":      "Charlotte North Carolina skyline uptown",
-  "New York":       "New York City Manhattan skyline Times Square",
+  "New York City":       "New York City Manhattan skyline Times Square",
   "Philadelphia":   "Philadelphia skyline Liberty Bell Independence Hall",
   "Washington DC":  "Washington DC Capitol Mall monuments",
   "Baltimore":      "Baltimore Inner Harbor skyline Maryland",
@@ -969,7 +969,7 @@ const tooltip = document.getElementById('tooltip');
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 function showTooltip(event, d) {
-  document.getElementById('tt-name').textContent = d.name === 'New York' ? 'New York City' : d.name;
+  document.getElementById('tt-name').textContent = d.name;
   document.getElementById('tt-state').textContent = d.state;
 
   // Show placeholder while loading
