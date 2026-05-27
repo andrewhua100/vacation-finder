@@ -737,37 +737,36 @@ function updateCities() {
 // ── CITY IMAGES (fetched live from Wikipedia API) ────────────────────────────
 const imageCache = {};
 
+const CITY_SEARCH_TERMS = {"Seattle": "Seattle skyline Space Needle", "Portland": "Portland Oregon skyline", "San Francisco": "San Francisco Golden Gate Bridge", "Los Angeles": "Los Angeles skyline Hollywood", "San Diego": "San Diego beach Coronado", "Las Vegas": "Las Vegas Strip night", "Phoenix": "Phoenix Arizona skyline desert", "Sedona": "Sedona red rocks Arizona", "Tucson": "Tucson Arizona saguaro desert", "Santa Fe": "Santa Fe New Mexico adobe", "Albuquerque": "Albuquerque balloon fiesta", "Denver": "Denver Colorado skyline mountains", "Aspen": "Aspen Colorado ski mountains", "Moab": "Moab Utah Arches canyon", "Salt Lake City": "Salt Lake City Utah temple", "Boise": "Boise Idaho skyline river", "Jackson": "Jackson Hole Wyoming Grand Teton", "Billings": "Billings Montana rimrocks", "Austin": "Austin Texas skyline Congress", "San Antonio": "San Antonio Riverwalk Texas", "Houston": "Houston Texas skyline downtown", "Dallas": "Dallas Texas skyline downtown", "Chicago": "Chicago skyline Lake Michigan", "Minneapolis": "Minneapolis skyline lakes", "St. Louis": "St Louis Gateway Arch Missouri", "Kansas City": "Kansas City skyline Missouri", "Detroit": "Detroit Michigan skyline river", "Milwaukee": "Milwaukee Wisconsin lakefront", "Indianapolis": "Indianapolis skyline Indiana", "Columbus": "Columbus Ohio skyline", "Cleveland": "Cleveland Ohio skyline lake", "Miami": "Miami Beach ocean palm trees Florida", "Orlando": "Orlando Florida theme park", "Tampa": "Tampa Bay beach Florida sunset", "Key West": "Key West Florida beach sunset tropical", "New Orleans": "New Orleans French Quarter jazz", "Nashville": "Nashville Tennessee Broadway honky tonk", "Memphis": "Memphis Tennessee Beale Street", "Atlanta": "Atlanta Georgia skyline Piedmont Park", "Charleston": "Charleston South Carolina historic waterfront", "Savannah": "Savannah Georgia moss oak squares", "Asheville": "Asheville North Carolina Blue Ridge mountains", "Charlotte": "Charlotte North Carolina skyline", "New York": "New York City Manhattan skyline", "Philadelphia": "Philadelphia Liberty Bell Independence", "Washington DC": "Washington DC National Mall Capitol", "Baltimore": "Baltimore Inner Harbor Maryland", "Boston": "Boston Massachusetts skyline harbor", "Portland ME": "Portland Maine lighthouse coast", "Burlington": "Burlington Vermont Lake Champlain", "Pittsburgh": "Pittsburgh skyline three rivers", "Bend": "Bend Oregon Cascade mountains Smith Rock", "Honolulu": "Honolulu Hawaii Waikiki beach", "Maui": "Maui Hawaii tropical beach ocean", "Anchorage": "Anchorage Alaska mountains wilderness", "Fairbanks": "Fairbanks Alaska northern lights aurora", "Louisville": "Louisville Kentucky Derby bourbon", "Richmond": "Richmond Virginia James River skyline", "Omaha": "Omaha Nebraska skyline Old Market", "Des Moines": "Des Moines Iowa Capitol skyline", "Tulsa": "Tulsa Oklahoma Art Deco skyline", "Oklahoma City": "Oklahoma City skyline Bricktown", "Raleigh": "Raleigh North Carolina skyline", "Greenville": "Greenville South Carolina Falls Park river", "Knoxville": "Knoxville Tennessee Market Square Smokies", "Chattanooga": "Chattanooga Tennessee river Lookout Mountain", "Birmingham": "Birmingham Alabama skyline Vulcan", "Baton Rouge": "Baton Rouge Louisiana Capitol river", "Little Rock": "Little Rock Arkansas river skyline", "Spokane": "Spokane Washington Riverfront Park falls", "Tacoma": "Tacoma Washington Mount Rainier waterfront", "Eugene": "Eugene Oregon Willamette river nature", "Bozeman": "Bozeman Montana Bridger Mountains", "Fort Collins": "Fort Collins Colorado Old Town", "Flagstaff": "Flagstaff Arizona ponderosa pine Grand Canyon"};
+
 async function fetchCityImages(cityName) {
   if (imageCache[cityName]) return imageCache[cityName];
+  const searchTerm = CITY_SEARCH_TERMS[cityName] || (cityName + ' city landmark');
   try {
-    const title = encodeURIComponent(cityName.replace(/ /g, '_'));
-    // Use the MediaWiki API to get multiple images from the city's Wikipedia page
-    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=images&imlimit=20&format=json&origin=*`;
+    // Wikimedia Commons search — keyword-based, returns relevant real photos
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&srnamespace=6&srlimit=12&format=json&origin=*`;
     const res = await fetch(url);
     const data = await res.json();
-    const pages = Object.values(data.query.pages);
-    const imageNames = (pages[0].images || [])
-      .map(i => i.title)
-      .filter(t => /\.(jpg|jpeg|png)$/i.test(t) && !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield/i.test(t));
+    const titles = (data.query.search || [])
+      .map(r => r.title)
+      .filter(t => /\.(jpg|jpeg|png)$/i.test(t));
 
-    // Fetch thumbnail URLs for up to 4 images in parallel
-    const picked = imageNames.slice(0, 8);
-    const thumbRequests = picked.map(name =>
-      fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*`)
-        .then(r => r.json())
-        .then(d => {
-          const p = Object.values(d.query.pages)[0];
-          return p.imageinfo && p.imageinfo[0] ? p.imageinfo[0].thumburl : null;
-        })
-        .catch(() => null)
+    // Fetch thumbnail URLs in parallel
+    const thumbRes = await fetch(
+      `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.slice(0,8).join('|'))}&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*`
     );
-    const thumbs = (await Promise.all(thumbRequests)).filter(Boolean);
-    if (thumbs.length >= 2) {
-      imageCache[cityName] = thumbs.slice(0, 4);
-      return imageCache[cityName];
+    const thumbData = await thumbRes.json();
+    const imgs = Object.values(thumbData.query.pages)
+      .filter(p => p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl)
+      .map(p => p.imageinfo[0].thumburl)
+      .slice(0, 4);
+
+    if (imgs.length >= 2) {
+      imageCache[cityName] = imgs;
+      return imgs;
     }
   } catch(e) {}
-  // Fallback: picsum with city-name seed
+  // Fallback: picsum
   const seed = encodeURIComponent(cityName);
   const fallback = [
     `https://picsum.photos/seed/${seed}a/640/360`,
