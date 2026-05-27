@@ -741,12 +741,30 @@ const CITY_SEARCH_TERMS = {"Seattle": "Seattle skyline Space Needle", "Portland"
 
 // Map tag IDs to visual search keywords
 const TAG_KEYWORDS = {
-  beach: 'beach', mountains: 'mountains', desert: 'desert', forest: 'forest',
-  lakes: 'lake', plains: 'skyline', canyon: 'canyon', islands: 'island',
-  nightlife: 'nightlife', culture: 'downtown', romantic: 'scenic', adventure: 'outdoor',
-  foodie: 'restaurant district', relaxation: 'park', family: 'attraction',
-  history: 'historic', ski: 'ski', wellness: 'nature', road_trip: 'landscape',
-  city_break: 'skyline', national_parks: 'national park',
+  // Landscape
+  beach:         'beach ocean waves sand',
+  mountains:     'mountain peak alpine landscape',
+  desert:        'desert landscape arid',
+  forest:        'forest trees woodland',
+  lakes:         'lake waterfront reflection',
+  plains:        'open plains prairie horizon',
+  canyon:        'canyon rock formation gorge',
+  islands:       'tropical island coastline',
+  // Atmosphere
+  nightlife:     'city skyline night lights',
+  culture:       'city landmark architecture',
+  romantic:      'scenic viewpoint sunset',
+  adventure:     'outdoor recreation landscape',
+  foodie:        'outdoor market street food',
+  relaxation:    'peaceful waterfront garden',
+  family:        'park outdoor recreation',
+  history:       'historic architecture old town',
+  // Style
+  ski:           'ski resort snow slopes',
+  wellness:      'spa resort nature retreat',
+  road_trip:     'scenic highway road landscape',
+  city_break:    'city skyline aerial view',
+  national_parks:'national park wilderness trail',
 };
 
 async function fetchCityImages(cityName) {
@@ -780,7 +798,7 @@ async function fetchCityImages(cityName) {
       if (seen.has(t)) return false;
       seen.add(t);
       return /\.(jpg|jpeg|png)$/i.test(t) &&
-        !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield|diagram|emblem/i.test(t);
+        !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield|diagram|emblem|tomb|grave|cemetery|headstone|plaque|portrait|sign|mural|wall|interior|indoor|museum_interior|hall|corridor|statue|bust|memorial_wall|inscription/i.test(t);
     }).slice(0, 12);
 
     if (titles.length === 0) throw new Error('no results');
