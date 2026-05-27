@@ -739,24 +739,35 @@ const imageCache = {};
 
 async function fetchCityImages(cityName) {
   if (imageCache[cityName]) return imageCache[cityName];
-  // Use Wikipedia REST API - returns direct stable CDN image URLs, no redirects
   try {
     const title = encodeURIComponent(cityName.replace(/ /g, '_'));
-    const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`, {
-      headers: { 'Accept': 'application/json' }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const imgs = [];
-      if (data.originalimage && data.originalimage.source) imgs.push(data.originalimage.source);
-      if (data.thumbnail && data.thumbnail.source) imgs.push(data.thumbnail.source);
-      if (imgs.length > 0) {
-        imageCache[cityName] = imgs;
-        return imgs;
-      }
+    // Use the MediaWiki API to get multiple images from the city's Wikipedia page
+    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=images&imlimit=20&format=json&origin=*`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const pages = Object.values(data.query.pages);
+    const imageNames = (pages[0].images || [])
+      .map(i => i.title)
+      .filter(t => /\.(jpg|jpeg|png)$/i.test(t) && !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield/i.test(t));
+
+    // Fetch thumbnail URLs for up to 4 images in parallel
+    const picked = imageNames.slice(0, 8);
+    const thumbRequests = picked.map(name =>
+      fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*`)
+        .then(r => r.json())
+        .then(d => {
+          const p = Object.values(d.query.pages)[0];
+          return p.imageinfo && p.imageinfo[0] ? p.imageinfo[0].thumburl : null;
+        })
+        .catch(() => null)
+    );
+    const thumbs = (await Promise.all(thumbRequests)).filter(Boolean);
+    if (thumbs.length >= 2) {
+      imageCache[cityName] = thumbs.slice(0, 4);
+      return imageCache[cityName];
     }
   } catch(e) {}
-  // Fallback: picsum with city-name seed (stable, direct URLs, no auth needed)
+  // Fallback: picsum with city-name seed
   const seed = encodeURIComponent(cityName);
   const fallback = [
     `https://picsum.photos/seed/${seed}a/640/360`,
