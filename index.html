@@ -176,8 +176,7 @@
   .tt-slide {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
+    overflow: hidden;
     opacity: 0;
     transition: opacity 0.7s ease;
   }
@@ -735,389 +734,38 @@ function updateCities() {
   }
 }
 
-// ── CITY IMAGES ───────────────────────────────────────────────────────────────
-const CITY_IMAGES = {
-  "Seattle": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Seattle_Kerry_Park_Skyline.jpg/640px-Seattle_Kerry_Park_Skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mount_Rainier_from_the_Space_Needle.jpg/640px-Mount_Rainier_from_the_Space_Needle.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Pike_Place_Market_sign.jpg/640px-Pike_Place_Market_sign.jpg",
-  ],
-  "Portland": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Portland_Oregon_skyline_with_Mount_Hood.jpg/640px-Portland_Oregon_skyline_with_Mount_Hood.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Portland_Oregon_Japanese_Garden.jpg/640px-Portland_Oregon_Japanese_Garden.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Multnomah_Falls_in_2017.jpg/427px-Multnomah_Falls_in_2017.jpg",
-  ],
-  "San Francisco": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/GoldenGateBridge-001.jpg/640px-GoldenGateBridge-001.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/San_Francisco_from_Marin_Headlands_in_March_2019.jpg/640px-San_Francisco_from_Marin_Headlands_in_March_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Alcatraz_Island_aerial_view.jpg/640px-Alcatraz_Island_aerial_view.jpg",
-  ],
-  "Los Angeles": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Los_Angeles_at_night_from_Griffith_Observatory.jpg/640px-Los_Angeles_at_night_from_Griffith_Observatory.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Santa_Monica_Pier.jpg/640px-Santa_Monica_Pier.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Southwest_corner_of_Central_Park%2C_looking_east%2C_NYC.jpg/640px-Southwest_corner_of_Central_Park%2C_looking_east%2C_NYC.jpg",
-  ],
-  "San Diego": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Coronado_Bridge_and_Downtown_San_Diego.jpg/640px-Coronado_Bridge_and_Downtown_San_Diego.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/San_Diego_Balboa_Park_December_2013.jpg/640px-San_Diego_Balboa_Park_December_2013.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/La_Jolla_Cove_2016.jpg/640px-La_Jolla_Cove_2016.jpg",
-  ],
-  "Las Vegas": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Las_Vegas_Strip_at_night.jpg/640px-Las_Vegas_Strip_at_night.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Bellagio_Fountains_2010.jpg/640px-Bellagio_Fountains_2010.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Red_Rock_Canyon_Calico_Hills.jpg/640px-Red_Rock_Canyon_Calico_Hills.jpg",
-  ],
-  "Phoenix": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Phoenix_Arizona_skyline.jpg/640px-Phoenix_Arizona_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Saguaro_National_Park_Arizona.jpg/640px-Saguaro_National_Park_Arizona.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Camelback_Mountain_Phoenix.jpg/640px-Camelback_Mountain_Phoenix.jpg",
-  ],
-  "Sedona": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cathedral_Rock_Sedona_Arizona.jpg/640px-Cathedral_Rock_Sedona_Arizona.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Bell_Rock_Sedona_Arizona.jpg/640px-Bell_Rock_Sedona_Arizona.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Sedona_Arizona_Chapel_of_the_Holy_Cross.jpg/427px-Sedona_Arizona_Chapel_of_the_Holy_Cross.jpg",
-  ],
-  "Tucson": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Tucson_skyline_2012.jpg/640px-Tucson_skyline_2012.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Saguaro_cactus_Saguaro_National_Park.jpg/427px-Saguaro_cactus_Saguaro_National_Park.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mount_Lemmon_Tucson_Arizona.jpg/640px-Mount_Lemmon_Tucson_Arizona.jpg",
-  ],
-  "Santa Fe": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Santa_Fe_New_Mexico_plaza.jpg/640px-Santa_Fe_New_Mexico_plaza.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Cathedral_Basilica_Santa_Fe_NM.jpg/427px-Cathedral_Basilica_Santa_Fe_NM.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Meow_Wolf_Santa_Fe.jpg/640px-Meow_Wolf_Santa_Fe.jpg",
-  ],
-  "Albuquerque": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Albuquerque_International_Balloon_Fiesta.jpg/640px-Albuquerque_International_Balloon_Fiesta.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Albuquerque_skyline_at_dusk.jpg/640px-Albuquerque_skyline_at_dusk.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Old_Town_Albuquerque_NM.jpg/640px-Old_Town_Albuquerque_NM.jpg",
-  ],
-  "Denver": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/DenverCP.jpg/640px-DenverCP.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Denver_Colorado_skyline.jpg/640px-Denver_Colorado_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Red_Rocks_Amphitheatre_Denver_Colorado.jpg/640px-Red_Rocks_Amphitheatre_Denver_Colorado.jpg",
-  ],
-  "Aspen": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Aspen_Colorado_aerial.jpg/640px-Aspen_Colorado_aerial.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Aspen_Snowmass_ski_resort.jpg/640px-Aspen_Snowmass_ski_resort.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Aspen_trees_Colorado_fall_colors.jpg/640px-Aspen_trees_Colorado_fall_colors.jpg",
-  ],
-  "Moab": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Delicate_Arch_LaSalle_Mountains_2006.jpg/427px-Delicate_Arch_LaSalle_Mountains_2006.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Canyonlands_National_Park%E2%80%A6Needles_area_%28165812871%29.jpg/640px-Canyonlands_National_Park%E2%80%A6Needles_area_%28165812871%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Balanced_Rock_Arches_NP.jpg/427px-Balanced_Rock_Arches_NP.jpg",
-  ],
-  "Salt Lake City": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Salt_Lake_City_skyline_2019.jpg/640px-Salt_Lake_City_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Temple_Square_Salt_Lake_City.jpg/640px-Temple_Square_Salt_Lake_City.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Great_Salt_Lake_Utah.jpg/640px-Great_Salt_Lake_Utah.jpg",
-  ],
-  "Boise": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Boise_Idaho_skyline.jpg/640px-Boise_Idaho_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Boise_River_Greenbelt.jpg/640px-Boise_River_Greenbelt.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Idaho_State_Capitol_Boise.jpg/427px-Idaho_State_Capitol_Boise.jpg",
-  ],
-  "Jackson": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Grand_Teton_NP-_Jackson_Hole_valley.jpg/640px-Grand_Teton_NP-_Jackson_Hole_valley.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Jackson_Hole_ski_resort.jpg/640px-Jackson_Hole_ski_resort.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Jackson_Wyoming_elk_arch.jpg/640px-Jackson_Wyoming_elk_arch.jpg",
-  ],
-  "Billings": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Billings_Montana_skyline.jpg/640px-Billings_Montana_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Rimrocks_Billings_Montana.jpg/640px-Rimrocks_Billings_Montana.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Little_Bighorn_Battlefield.jpg/640px-Little_Bighorn_Battlefield.jpg",
-  ],
-  "Austin": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Austin_Texas_skyline.jpg/640px-Austin_Texas_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Congress_Avenue_Bridge_bats_Austin.jpg/640px-Congress_Avenue_Bridge_bats_Austin.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/6th_Street_Austin_Texas.jpg/640px-6th_Street_Austin_Texas.jpg",
-  ],
-  "San Antonio": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/San_Antonio_River_Walk.jpg/427px-San_Antonio_River_Walk.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/The_Alamo_San_Antonio.jpg/640px-The_Alamo_San_Antonio.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/San_Antonio_skyline_2019.jpg/640px-San_Antonio_skyline_2019.jpg",
-  ],
-  "Houston": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Houston_skyline_from_Tranquility_Park.jpg/640px-Houston_skyline_from_Tranquility_Park.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Space_Center_Houston.jpg/640px-Space_Center_Houston.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Houston_Museum_District.jpg/640px-Houston_Museum_District.jpg",
-  ],
-  "Dallas": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Dallas_skyline_2019.jpg/640px-Dallas_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Reunion_Tower_Dallas_Texas.jpg/427px-Reunion_Tower_Dallas_Texas.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Dealey_Plaza_Dallas_Texas.jpg/640px-Dealey_Plaza_Dallas_Texas.jpg",
-  ],
-  "Chicago": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Millennium_Park_The_Bean.jpg/640px-Millennium_Park_The_Bean.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Chicago_River_skyline.jpg/640px-Chicago_River_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Chicago_Navy_Pier.jpg/640px-Chicago_Navy_Pier.jpg",
-  ],
-  "Minneapolis": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Minneapolis_skyline.jpg/640px-Minneapolis_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Stone_Arch_Bridge_Minneapolis.jpg/640px-Stone_Arch_Bridge_Minneapolis.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Mall_of_America_interior.jpg/640px-Mall_of_America_interior.jpg",
-  ],
-  "St. Louis": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/St_Louis_night_expblend_edit2.jpg/640px-St_Louis_night_expblend_edit2.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Gateway_Arch_Jefferson_National_Expansion_Memorial.jpg/427px-Gateway_Arch_Jefferson_National_Expansion_Memorial.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Forest_Park_St_Louis.jpg/640px-Forest_Park_St_Louis.jpg",
-  ],
-  "Kansas City": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Kansas_City_Missouri_skyline_2013.jpg/640px-Kansas_City_Missouri_skyline_2013.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Country_Club_Plaza_Kansas_City.jpg/640px-Country_Club_Plaza_Kansas_City.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Liberty_Memorial_Kansas_City.jpg/640px-Liberty_Memorial_Kansas_City.jpg",
-  ],
-  "Detroit": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Detroit_skyline_2015.jpg/640px-Detroit_skyline_2015.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Detroit_Institute_of_Arts.jpg/640px-Detroit_Institute_of_Arts.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Eastern_Market_Detroit.jpg/640px-Eastern_Market_Detroit.jpg",
-  ],
-  "Milwaukee": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Milwaukee_Skyline_2014.jpg/640px-Milwaukee_Skyline_2014.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Milwaukee_Art_Museum.jpg/640px-Milwaukee_Art_Museum.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Historic_Third_Ward_Milwaukee.jpg/640px-Historic_Third_Ward_Milwaukee.jpg",
-  ],
-  "Indianapolis": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Indianapolis_skyline_2019.jpg/640px-Indianapolis_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Indianapolis_Motor_Speedway.jpg/640px-Indianapolis_Motor_Speedway.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Indiana_War_Memorial_Indianapolis.jpg/427px-Indiana_War_Memorial_Indianapolis.jpg",
-  ],
-  "Columbus": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Columbus_Ohio_skyline_2019.jpg/640px-Columbus_Ohio_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Short_North_Columbus_Ohio.jpg/640px-Short_North_Columbus_Ohio.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Ohio_Statehouse_Columbus.jpg/427px-Ohio_Statehouse_Columbus.jpg",
-  ],
-  "Cleveland": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Cleveland_skyline_2019.jpg/640px-Cleveland_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Rock_and_Roll_Hall_of_Fame_Cleveland.jpg/640px-Rock_and_Roll_Hall_of_Fame_Cleveland.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/West_Side_Market_Cleveland.jpg/427px-West_Side_Market_Cleveland.jpg",
-  ],
-  "Miami": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Miami_Downtown_2019.jpg/640px-Miami_Downtown_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/South_Beach_Miami_Beach.jpg/640px-South_Beach_Miami_Beach.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Wynwood_Walls_Miami.jpg/427px-Wynwood_Walls_Miami.jpg",
-  ],
-  "Orlando": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Cinderella_Castle_Magic_Kingdom.jpg/427px-Cinderella_Castle_Magic_Kingdom.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Orlando_Florida_skyline.jpg/640px-Orlando_Florida_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Universal_Studios_Florida.jpg/640px-Universal_Studios_Florida.jpg",
-  ],
-  "Tampa": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Tampa_skyline_2019.jpg/640px-Tampa_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Clearwater_Beach_Florida.jpg/640px-Clearwater_Beach_Florida.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Tampa_Bay_sunset.jpg/640px-Tampa_Bay_sunset.jpg",
-  ],
-  "Key West": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Duval_Street_Key_West.jpg/640px-Duval_Street_Key_West.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Key_West_Florida_sunset.jpg/640px-Key_West_Florida_sunset.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Key_West_Southernmost_Point.jpg/427px-Key_West_Southernmost_Point.jpg",
-  ],
-  "New Orleans": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/New_Orleans_French_Quarter.jpg/640px-New_Orleans_French_Quarter.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/New_Orleans_Mardi_Gras.jpg/640px-New_Orleans_Mardi_Gras.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/St_Louis_Cathedral_New_Orleans.jpg/427px-St_Louis_Cathedral_New_Orleans.jpg",
-  ],
-  "Nashville": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/thirty/Nashville_skyline_2019.jpg/640px-Nashville_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Broadway_Nashville_Tennessee.jpg/640px-Broadway_Nashville_Tennessee.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Parthenon_Nashville_Tennessee.jpg/640px-Parthenon_Nashville_Tennessee.jpg",
-  ],
-  "Memphis": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Memphis_Tennessee_skyline_2019.jpg/640px-Memphis_Tennessee_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Beale_Street_Memphis_Tennessee.jpg/640px-Beale_Street_Memphis_Tennessee.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Sun_Studio_Memphis_Tennessee.jpg/427px-Sun_Studio_Memphis_Tennessee.jpg",
-  ],
-  "Atlanta": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Atlanta_aerial_from_plane_May_2015.jpg/640px-Atlanta_aerial_from_plane_May_2015.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Georgia_Aquarium_Atlanta.jpg/640px-Georgia_Aquarium_Atlanta.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Centennial_Olympic_Park_Atlanta.jpg/640px-Centennial_Olympic_Park_Atlanta.jpg",
-  ],
-  "Charleston": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Charleston_SC_waterfront.jpg/640px-Charleston_SC_waterfront.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Rainbow_Row_Charleston_SC.jpg/640px-Rainbow_Row_Charleston_SC.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Fort_Sumter_Charleston.jpg/640px-Fort_Sumter_Charleston.jpg",
-  ],
-  "Savannah": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Savannah_Georgia_Forsyth_Park.jpg/640px-Savannah_Georgia_Forsyth_Park.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Savannah_Georgia_historic_district.jpg/640px-Savannah_Georgia_historic_district.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Bonaventure_Cemetery_Savannah.jpg/640px-Bonaventure_Cemetery_Savannah.jpg",
-  ],
-  "Asheville": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Asheville_NC_skyline_2019.jpg/640px-Asheville_NC_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Biltmore_Estate_Asheville_NC.jpg/640px-Biltmore_Estate_Asheville_NC.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Blue_Ridge_Parkway_fall_colors.jpg/640px-Blue_Ridge_Parkway_fall_colors.jpg",
-  ],
-  "Charlotte": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Charlotte_NC_skyline_2019.jpg/640px-Charlotte_NC_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/NASCAR_Hall_of_Fame_Charlotte.jpg/640px-NASCAR_Hall_of_Fame_Charlotte.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/NoDa_Charlotte_North_Carolina.jpg/640px-NoDa_Charlotte_North_Carolina.jpg",
-  ],
-  "New York": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Southwest_corner_of_Central_Park%2C_looking_east%2C_NYC.jpg/640px-Southwest_corner_of_Central_Park%2C_looking_east%2C_NYC.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/427px-Empire_State_Building_%28aerial_view%29.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Brooklyn_Bridge_Manhattan_Bridge_from_above.jpg/640px-Brooklyn_Bridge_Manhattan_Bridge_from_above.jpg",
-  ],
-  "Philadelphia": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Philadelphia_from_the_air.jpg/640px-Philadelphia_from_the_air.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Independence_Hall_Philadelphia.jpg/640px-Independence_Hall_Philadelphia.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Eastern_State_Penitentiary_Philadelphia.jpg/640px-Eastern_State_Penitentiary_Philadelphia.jpg",
-  ],
-  "Washington DC": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Washington_DC_on_the_National_Mall.jpg/640px-Washington_DC_on_the_National_Mall.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Lincoln_Memorial_Washington_DC.jpg/640px-Lincoln_Memorial_Washington_DC.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/US_Capitol_Building.jpg/640px-US_Capitol_Building.jpg",
-  ],
-  "Baltimore": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Baltimore_Inner_Harbor_2019.jpg/640px-Baltimore_Inner_Harbor_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Fort_McHenry_Baltimore.jpg/640px-Fort_McHenry_Baltimore.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Fells_Point_Baltimore.jpg/640px-Fells_Point_Baltimore.jpg",
-  ],
-  "Boston": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Boston_skyline_from_harbor.jpg/640px-Boston_skyline_from_harbor.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Faneuil_Hall_Boston.jpg/640px-Faneuil_Hall_Boston.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Harvard_University_Cambridge_MA.jpg/640px-Harvard_University_Cambridge_MA.jpg",
-  ],
-  "Portland ME": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Portland_Maine_Old_Port.jpg/640px-Portland_Maine_Old_Port.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Portland_Head_Light_Maine.jpg/640px-Portland_Head_Light_Maine.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Casco_Bay_Portland_Maine.jpg/640px-Casco_Bay_Portland_Maine.jpg",
-  ],
-  "Burlington": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Burlington_Vermont_waterfront.jpg/640px-Burlington_Vermont_waterfront.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Church_Street_Marketplace_Burlington_Vermont.jpg/427px-Church_Street_Marketplace_Burlington_Vermont.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Lake_Champlain_Burlington_Vermont.jpg/640px-Lake_Champlain_Burlington_Vermont.jpg",
-  ],
-  "Pittsburgh": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Pittsburgh_skyline_from_the_air.jpg/640px-Pittsburgh_skyline_from_the_air.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Point_State_Park_Pittsburgh.jpg/640px-Point_State_Park_Pittsburgh.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Duquesne_Incline_Pittsburgh.jpg/427px-Duquesne_Incline_Pittsburgh.jpg",
-  ],
-  "Bend": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Bend_Oregon_skyline_Mount_Bachelor.jpg/640px-Bend_Oregon_skyline_Mount_Bachelor.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Smith_Rock_State_Park_Oregon.jpg/640px-Smith_Rock_State_Park_Oregon.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Deschutes_River_Bend_Oregon.jpg/640px-Deschutes_River_Bend_Oregon.jpg",
-  ],
-  "Honolulu": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Waikiki_Beach_Honolulu_Hawaii.jpg/640px-Waikiki_Beach_Honolulu_Hawaii.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Diamond_Head_crater_Honolulu.jpg/640px-Diamond_Head_crater_Honolulu.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Pearl_Harbor_Memorial_Hawaii.jpg/640px-Pearl_Harbor_Memorial_Hawaii.jpg",
-  ],
-  "Maui": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Road_to_Hana_Maui_Hawaii.jpg/640px-Road_to_Hana_Maui_Hawaii.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Haleakala_crater_Maui_Hawaii.jpg/640px-Haleakala_crater_Maui_Hawaii.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ka%27anapali_Beach_Maui.jpg/640px-Ka%27anapali_Beach_Maui.jpg",
-  ],
-  "Anchorage": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Anchorage_Alaska_skyline.jpg/640px-Anchorage_Alaska_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Denali_National_Park_Alaska.jpg/640px-Denali_National_Park_Alaska.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Northern_lights_Alaska.jpg/640px-Northern_lights_Alaska.jpg",
-  ],
-  "Fairbanks": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Aurora_Borealis_Fairbanks_Alaska.jpg/640px-Aurora_Borealis_Fairbanks_Alaska.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Chena_River_Fairbanks_Alaska.jpg/640px-Chena_River_Fairbanks_Alaska.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Fairbanks_Alaska_winter.jpg/640px-Fairbanks_Alaska_winter.jpg",
-  ],
-  "Louisville": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Louisville_Kentucky_skyline.jpg/640px-Louisville_Kentucky_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Churchill_Downs_Louisville_Kentucky.jpg/640px-Churchill_Downs_Louisville_Kentucky.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Louisville_Slugger_Museum.jpg/427px-Louisville_Slugger_Museum.jpg",
-  ],
-  "Richmond": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Richmond_Virginia_skyline.jpg/640px-Richmond_Virginia_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/James_River_Richmond_Virginia.jpg/640px-James_River_Richmond_Virginia.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Monument_Avenue_Richmond_Virginia.jpg/640px-Monument_Avenue_Richmond_Virginia.jpg",
-  ],
-  "Omaha": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Omaha_Nebraska_skyline.jpg/640px-Omaha_Nebraska_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Old_Market_Omaha_Nebraska.jpg/427px-Old_Market_Omaha_Nebraska.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Henry_Doorly_Zoo_Omaha.jpg/640px-Henry_Doorly_Zoo_Omaha.jpg",
-  ],
-  "Des Moines": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Des_Moines_Iowa_skyline.jpg/640px-Des_Moines_Iowa_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Iowa_State_Capitol_Des_Moines.jpg/427px-Iowa_State_Capitol_Des_Moines.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Principal_Park_Des_Moines.jpg/640px-Principal_Park_Des_Moines.jpg",
-  ],
-  "Tulsa": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Tulsa_Oklahoma_skyline.jpg/640px-Tulsa_Oklahoma_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/BOK_Center_Tulsa_Oklahoma.jpg/640px-BOK_Center_Tulsa_Oklahoma.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Philbrook_Museum_Tulsa.jpg/640px-Philbrook_Museum_Tulsa.jpg",
-  ],
-  "Oklahoma City": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Oklahoma_City_skyline_2019.jpg/640px-Oklahoma_City_skyline_2019.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Oklahoma_City_National_Memorial.jpg/640px-Oklahoma_City_National_Memorial.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Bricktown_Oklahoma_City.jpg/640px-Bricktown_Oklahoma_City.jpg",
-  ],
-  "Raleigh": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Raleigh_North_Carolina_skyline.jpg/640px-Raleigh_North_Carolina_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/North_Carolina_Museum_of_Art_Raleigh.jpg/640px-North_Carolina_Museum_of_Art_Raleigh.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/NC_State_Campus_Raleigh.jpg/640px-NC_State_Campus_Raleigh.jpg",
-  ],
-  "Greenville": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Greenville_South_Carolina_skyline.jpg/640px-Greenville_South_Carolina_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Falls_Park_Reedy_River_Greenville_SC.jpg/427px-Falls_Park_Reedy_River_Greenville_SC.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Main_Street_Greenville_SC.jpg/640px-Main_Street_Greenville_SC.jpg",
-  ],
-  "Knoxville": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Knoxville_Tennessee_skyline.jpg/640px-Knoxville_Tennessee_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Market_Square_Knoxville_Tennessee.jpg/640px-Market_Square_Knoxville_Tennessee.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Smoky_Mountains_Tennessee.jpg/640px-Smoky_Mountains_Tennessee.jpg",
-  ],
-  "Chattanooga": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Chattanooga_Tennessee_skyline.jpg/640px-Chattanooga_Tennessee_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Tennessee_Aquarium_Chattanooga.jpg/427px-Tennessee_Aquarium_Chattanooga.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lookout_Mountain_Chattanooga.jpg/640px-Lookout_Mountain_Chattanooga.jpg",
-  ],
-  "Birmingham": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Birmingham_Alabama_skyline.jpg/640px-Birmingham_Alabama_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Vulcan_Park_Birmingham_Alabama.jpg/427px-Vulcan_Park_Birmingham_Alabama.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Birmingham_Civil_Rights_Institute.jpg/640px-Birmingham_Civil_Rights_Institute.jpg",
-  ],
-  "Baton Rouge": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Baton_Rouge_Louisiana_skyline.jpg/640px-Baton_Rouge_Louisiana_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Louisiana_State_Capitol_Baton_Rouge.jpg/427px-Louisiana_State_Capitol_Baton_Rouge.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/LSU_Campus_Baton_Rouge.jpg/640px-LSU_Campus_Baton_Rouge.jpg",
-  ],
-  "Little Rock": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Little_Rock_Arkansas_skyline.jpg/640px-Little_Rock_Arkansas_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Clinton_Presidential_Library_Little_Rock.jpg/640px-Clinton_Presidential_Library_Little_Rock.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Arkansas_River_Little_Rock.jpg/640px-Arkansas_River_Little_Rock.jpg",
-  ],
-  "Spokane": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Spokane_Washington_skyline.jpg/640px-Spokane_Washington_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Riverfront_Park_Spokane_Washington.jpg/640px-Riverfront_Park_Spokane_Washington.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Spokane_Falls_Washington.jpg/427px-Spokane_Falls_Washington.jpg",
-  ],
-  "Tacoma": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Tacoma_Washington_skyline_Mount_Rainier.jpg/640px-Tacoma_Washington_skyline_Mount_Rainier.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Museum_of_Glass_Tacoma_Washington.jpg/640px-Museum_of_Glass_Tacoma_Washington.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Point_Defiance_Park_Tacoma.jpg/640px-Point_Defiance_Park_Tacoma.jpg",
-  ],
-  "Eugene": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Eugene_Oregon_skyline.jpg/640px-Eugene_Oregon_skyline.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Autzen_Stadium_Eugene_Oregon.jpg/640px-Autzen_Stadium_Eugene_Oregon.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Spencer_Butte_Eugene_Oregon.jpg/640px-Spencer_Butte_Eugene_Oregon.jpg",
-  ],
-  "Bozeman": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Bozeman_Montana_skyline_Bridger_Mountains.jpg/640px-Bozeman_Montana_skyline_Bridger_Mountains.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Yellowstone_National_Park_Grand_Prismatic.jpg/640px-Yellowstone_National_Park_Grand_Prismatic.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Big_Sky_Montana_ski_resort.jpg/640px-Big_Sky_Montana_ski_resort.jpg",
-  ],
-  "Fort Collins": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Fort_Collins_Colorado_Old_Town.jpg/640px-Fort_Collins_Colorado_Old_Town.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Colorado_State_University_Fort_Collins.jpg/640px-Colorado_State_University_Fort_Collins.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Cache_la_Poudre_River_Fort_Collins.jpg/640px-Cache_la_Poudre_River_Fort_Collins.jpg",
-  ],
-  "Flagstaff": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Flagstaff_Arizona_downtown.jpg/640px-Flagstaff_Arizona_downtown.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Humphreys_Peak_Flagstaff_Arizona.jpg/640px-Humphreys_Peak_Flagstaff_Arizona.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Lowell_Observatory_Flagstaff_Arizona.jpg/427px-Lowell_Observatory_Flagstaff_Arizona.jpg",
-  ],
-};
+// ── CITY IMAGES (fetched live from Wikipedia API) ────────────────────────────
+const imageCache = {};
 
-// fallback placeholder for any missing city
-const FALLBACK_IMGS = [
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/640px-No_image_available.svg.png"
-];
+async function fetchCityImages(cityName) {
+  if (imageCache[cityName]) return imageCache[cityName];
+  // Use Wikipedia REST API - returns direct stable CDN image URLs, no redirects
+  try {
+    const title = encodeURIComponent(cityName.replace(/ /g, '_'));
+    const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const imgs = [];
+      if (data.originalimage && data.originalimage.source) imgs.push(data.originalimage.source);
+      if (data.thumbnail && data.thumbnail.source) imgs.push(data.thumbnail.source);
+      if (imgs.length > 0) {
+        imageCache[cityName] = imgs;
+        return imgs;
+      }
+    }
+  } catch(e) {}
+  // Fallback: picsum with city-name seed (stable, direct URLs, no auth needed)
+  const seed = encodeURIComponent(cityName);
+  const fallback = [
+    `https://picsum.photos/seed/${seed}a/640/360`,
+    `https://picsum.photos/seed/${seed}b/640/360`,
+    `https://picsum.photos/seed/${seed}c/640/360`,
+  ];
+  imageCache[cityName] = fallback;
+  return fallback;
+}
 
 // ── SLIDESHOW STATE ───────────────────────────────────────────────────────────
 let slideshowInterval = null;
@@ -1138,7 +786,11 @@ function startSlideshow(images) {
   images.forEach((src, i) => {
     const slide = document.createElement('div');
     slide.className = 'tt-slide' + (i === 0 ? ' active' : '');
-    slide.style.backgroundImage = `url(${src})`;
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+    img.onerror = () => { img.style.display = 'none'; slide.style.background = '#1a1612'; };
+    slide.appendChild(img);
     container.insertBefore(slide, dotsEl);
 
     const dot = document.createElement('div');
@@ -1172,8 +824,9 @@ function showTooltip(event, d) {
   document.getElementById('tt-name').textContent = d.name;
   document.getElementById('tt-state').textContent = d.state;
 
-  const imgs = CITY_IMAGES[d.name] || FALLBACK_IMGS;
-  startSlideshow(imgs);
+  // Show placeholder while loading
+  startSlideshow([`https://picsum.photos/seed/${d.name.charCodeAt(0)}/640/360`]);
+  fetchCityImages(d.name).then(imgs => startSlideshow(imgs));
 
   const vibesEl = document.getElementById('tt-vibes');
   vibesEl.innerHTML = '';
