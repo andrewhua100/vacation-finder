@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Vibe Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f2ede3;
+    --panel: #fdfaf4;
+    --border: #ddd6c4;
+    --text: #2a2418;
+    --muted: #8a7f6e;
+    --accent: #c4793a;
+    --accent-light: #f5e8d8;
+    --green: #3d8c5a;
+    --red: #c44040;
+    --amber: #c49a3a;
+    --amber-light: #fdf3d8;
+    --shadow: 0 2px 12px rgba(42,36,24,0.08);
+    --shadow-lg: 0 8px 32px rgba(42,36,24,0.14);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+    z-index: 10;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .tagline { font-size: 11px; color: var(--muted); font-weight: 400; letter-spacing: 0.6px; text-transform: uppercase; margin-top: 1px; }
+  .match-pill {
+    margin-left: auto;
+    background: var(--green);
+    color: #fff;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    opacity: 0;
+  }
+  .match-pill.visible { opacity: 1; }
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 272px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 18px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 9px;
+  }
+  .month-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .month-btn {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 3px 5px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .month-btn:hover { border-color: var(--amber); background: var(--amber-light); }
+  .month-btn.active { background: var(--amber); border-color: var(--amber); color: #fff; }
+  .month-num { font-size: 8.5px; font-weight: 600; opacity: 0.55; }
+  .month-name { font-size: 11.5px; font-weight: 600; }
+  .tag-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 11px;
+    border-radius: 18px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    font-size: 12px; font-weight: 500;
+    transition: all 0.14s ease;
+    user-select: none;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tag:hover { border-color: var(--accent); background: var(--accent-light); }
+  .tag.active { background: var(--text); border-color: var(--text); color: #fff; }
+  .tag .icon { font-size: 12px; }
+  .clear-btn {
+    background: none; border: 1.5px solid var(--border); border-radius: 7px;
+    padding: 8px 14px; cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    transition: all 0.14s ease; width: 100%;
+  }
+  .clear-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* MAP */
+  .map-area { flex: 1; position: relative; overflow: hidden; background: #c8dce8; }
+  #map-svg { width: 100%; height: 100%; }
+
+  /* D3 map elements */
+  .state-path { fill: #d6e8c4; stroke: #b4c8a0; stroke-width: 0.6px; transition: fill 0.2s; }
+  .state-path:hover { fill: #c8e0b4; }
+  .graticule { fill: none; stroke: #b8ccd8; stroke-width: 0.4px; }
+  .nation-border { fill: none; stroke: #8aaa78; stroke-width: 1.2px; }
+
+  .city-group { cursor: pointer; }
+  .city-circle { transition: r 0.25s ease, fill 0.3s ease, opacity 0.3s ease; }
+  .city-label {
+    font-family: 'DM Sans', sans-serif;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .city-pulse { pointer-events: none; }
+
+  /* Tooltip */
+  #tooltip {
+    position: absolute;
+    background: #1e1a14;
+    color: #fff;
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    max-width: 210px;
+    z-index: 100;
+    box-shadow: var(--shadow-lg);
+  }
+  #tooltip.show { opacity: 1; }
+  #tooltip .tt-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  #tooltip .tt-state { opacity: 0.5; font-size: 10px; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.8px; }
+  #tooltip .tt-vibes { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 7px; }
+  #tooltip .tt-vibe { background: rgba(255,255,255,0.12); border-radius: 4px; padding: 2px 6px; font-size: 10px; text-transform: capitalize; }
+  #tooltip .tt-months { font-size: 10px; opacity: 0.6; }
+  #tooltip .tt-warn { color: #ff9a9a; font-size: 10px; margin-top: 4px; }
+
+  /* Legend */
+  .legend {
+    position: absolute; bottom: 18px; right: 18px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 15px; box-shadow: var(--shadow);
+  }
+  .legend-title { font-size: 9.5px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .legend-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 500; margin-bottom: 5px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Hint bar */
+  .hint {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 20px; padding: 7px 16px;
+    font-size: 12px; color: var(--muted); box-shadow: var(--shadow);
+    white-space: nowrap; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .hint.hidden { opacity: 0; }
+
+  /* Loading */
+  .map-loading {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #c8dce8; font-size: 13px; color: #7090a0; font-weight: 500;
+    pointer-events: none; transition: opacity 0.5s;
+  }
+  .map-loading.done { opacity: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">US <span>Vibe</span> Finder</div>
+    <div class="tagline">Find your perfect destination</div>
+  </div>
+  <div class="match-pill" id="match-pill">0 matches</div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+    <div>
+      <div class="section-label">Best Month to Visit</div>
+      <div class="month-grid" id="month-grid"></div>
+    </div>
+    <div>
+      <div class="section-label">Landscape</div>
+      <div class="tag-group" id="landscape-group"></div>
+    </div>
+    <div>
+      <div class="section-label">Atmosphere</div>
+      <div class="tag-group" id="atmosphere-group"></div>
+    </div>
+    <div>
+      <div class="section-label">Travel Style</div>
+      <div class="tag-group" id="style-group"></div>
+    </div>
+    <div>
+      <div class="section-label">Budget</div>
+      <div class="tag-group" id="budget-group"></div>
+    </div>
+    <button class="clear-btn" onclick="clearAll()">✕ Clear all filters</button>
+  </div>
+
+  <div class="map-area" id="map-area">
+    <svg id="map-svg"></svg>
+    <div class="map-loading" id="map-loading">Loading map…</div>
+    <div id="tooltip">
+      <div class="tt-name" id="tt-name"></div>
+      <div class="tt-state" id="tt-state"></div>
+      <div class="tt-vibes" id="tt-vibes"></div>
+      <div class="tt-months" id="tt-months"></div>
+      <div class="tt-warn" id="tt-warn"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-title">Match Status</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#3d8c5a"></div> Strong match</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#c44040"></div> Wrong season</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#9aaa9a"></div> No filter set</div>
+      <div class="legend-row" style="margin-bottom:0"><div class="legend-dot" style="background:#ccc6c0"></div> Doesn't match</div>
+    </div>
+    <div class="hint" id="hint">👆 Select filters to find your perfect city</div>
+  </div>
+</div>
+
+<script>
+// ── FILTER DEFINITIONS ──────────────────────────────────────────────────────
+const MONTHS = [
+  {num:'01',name:'Jan'},{num:'02',name:'Feb'},{num:'03',name:'Mar'},{num:'04',name:'Apr'},
+  {num:'05',name:'May'},{num:'06',name:'Jun'},{num:'07',name:'Jul'},{num:'08',name:'Aug'},
+  {num:'09',name:'Sep'},{num:'10',name:'Oct'},{num:'11',name:'Nov'},{num:'12',name:'Dec'}
+];
+const FILTERS = {
+  landscape: [
+    {id:'beach',icon:'🏖️',label:'Beach'},{id:'mountains',icon:'⛰️',label:'Mountains'},
+    {id:'desert',icon:'🌵',label:'Desert'},{id:'forest',icon:'🌲',label:'Forest'},
+    {id:'lakes',icon:'🏞️',label:'Lakes'},{id:'plains',icon:'🌾',label:'Plains'},
+    {id:'canyon',icon:'🏜️',label:'Canyon'},{id:'islands',icon:'🏝️',label:'Islands'},
+  ],
+  atmosphere: [
+    {id:'nightlife',icon:'🎵',label:'Nightlife'},{id:'culture',icon:'🎭',label:'Culture'},
+    {id:'romantic',icon:'🌹',label:'Romantic'},{id:'adventure',icon:'⚡',label:'Adventure'},
+    {id:'foodie',icon:'🍜',label:'Foodie'},{id:'relaxation',icon:'🧘',label:'Relaxation'},
+    {id:'family',icon:'👨‍👩‍👧',label:'Family'},{id:'history',icon:'🏛️',label:'History'},
+  ],
+  style: [
+    {id:'road_trip',icon:'🚗',label:'Road Trip'},{id:'city_break',icon:'🏙️',label:'City Break'},
+    {id:'national_parks',icon:'🌿',label:'Nat. Parks'},{id:'ski',icon:'⛷️',label:'Ski'},
+    {id:'wellness',icon:'✨',label:'Wellness'},
+  ],
+  budget: [
+    {id:'budget',icon:'💵',label:'Budget'},{id:'mid_range',icon:'💳',label:'Mid-range'},{id:'luxury',icon:'💎',label:'Luxury'},
+  ]
+};
+
+// ── CITY DATA (Albers USA projected) ────────────────────────────────────────
+const CITIES = [
+  { name:"Seattle", state:"WA", x:150.5, y:516.2, landscape:['forest','mountains','lakes'], atmosphere:['culture','foodie','nightlife'], style:['city_break','road_trip'], budget:['mid_range'], months:[5,6,7,8,9] },
+  { name:"Portland", state:"OR", x:135.4, y:480.0, landscape:['forest','mountains','lakes'], atmosphere:['culture','foodie','relaxation'], style:['city_break','road_trip'], budget:['mid_range'], months:[5,6,7,8,9] },
+  { name:"San Francisco", state:"CA", x:98.7, y:339.0, landscape:['beach','mountains','forest'], atmosphere:['culture','foodie','nightlife','romantic'], style:['city_break'], budget:['luxury','mid_range'], months:[5,6,7,8,9,10] },
+  { name:"Los Angeles", state:"CA", x:141.6, y:255.3, landscape:['beach','mountains','desert'], atmosphere:['nightlife','culture','foodie','relaxation'], style:['city_break'], budget:['luxury','mid_range'], months:[4,5,6,7,8,9,10,11] },
+  { name:"San Diego", state:"CA", x:152.2, y:227.2, landscape:['beach','desert'], atmosphere:['relaxation','foodie','nightlife'], style:['city_break'], budget:['mid_range'], months:[4,5,6,7,8,9,10,11] },
+  { name:"Las Vegas", state:"NV", x:196.1, y:284.2, landscape:['desert','canyon'], atmosphere:['nightlife','culture','adventure'], style:['city_break'], budget:['mid_range','luxury'], months:[3,4,5,10,11] },
+  { name:"Phoenix", state:"AZ", x:232.5, y:225.2, landscape:['desert','canyon'], atmosphere:['relaxation','culture','adventure'], style:['road_trip','wellness'], budget:['mid_range'], months:[1,2,3,11,12] },
+  { name:"Sedona", state:"AZ", x:241.6, y:250.8, landscape:['desert','canyon'], atmosphere:['relaxation','adventure','romantic'], style:['road_trip','wellness'], budget:['mid_range','luxury'], months:[3,4,5,10,11] },
+  { name:"Tucson", state:"AZ", x:245.8, y:200.2, landscape:['desert'], atmosphere:['culture','relaxation'], style:['road_trip'], budget:['budget','mid_range'], months:[1,2,3,11,12] },
+  { name:"Santa Fe", state:"NM", x:330.9, y:254.3, landscape:['desert','mountains'], atmosphere:['culture','history','relaxation','romantic'], style:['road_trip'], budget:['mid_range','luxury'], months:[4,5,6,9,10] },
+  { name:"Albuquerque", state:"NM", x:319.0, y:244.0, landscape:['desert','mountains'], atmosphere:['culture','history','adventure'], style:['road_trip'], budget:['budget','mid_range'], months:[4,5,6,9,10] },
+  { name:"Denver", state:"CO", x:352.4, y:328.8, landscape:['mountains','plains'], atmosphere:['adventure','nightlife','culture','foodie'], style:['city_break','road_trip','ski'], budget:['mid_range'], months:[4,5,6,7,8,9,10] },
+  { name:"Aspen", state:"CO", x:325.2, y:321.3, landscape:['mountains','forest'], atmosphere:['relaxation','adventure','romantic'], style:['ski','wellness'], budget:['luxury'], months:[12,1,2,3,6,7,8] },
+  { name:"Moab", state:"UT", x:284.7, y:314.7, landscape:['desert','canyon'], atmosphere:['adventure'], style:['road_trip','national_parks'], budget:['budget','mid_range'], months:[3,4,5,9,10,11] },
+  { name:"Salt Lake City", state:"UT", x:258.2, y:360.6, landscape:['mountains','desert','lakes'], atmosphere:['adventure','culture'], style:['city_break','ski'], budget:['mid_range'], months:[4,5,6,7,8,9] },
+  { name:"Boise", state:"ID", x:210.2, y:424.6, landscape:['mountains','desert','forest'], atmosphere:['adventure','relaxation'], style:['road_trip'], budget:['budget','mid_range'], months:[5,6,7,8,9] },
+  { name:"Jackson", state:"WY", x:281.7, y:408.6, landscape:['mountains','forest','plains'], atmosphere:['adventure','relaxation'], style:['ski','road_trip','national_parks'], budget:['luxury','mid_range'], months:[6,7,8,12,1,2] },
+  { name:"Billings", state:"MT", x:317.5, y:446.9, landscape:['mountains','plains','forest'], atmosphere:['adventure'], style:['road_trip','national_parks'], budget:['budget','mid_range'], months:[5,6,7,8,9] },
+  { name:"Austin", state:"TX", x:452.0, y:144.9, landscape:['plains'], atmosphere:['nightlife','culture','foodie'], style:['city_break'], budget:['mid_range'], months:[3,4,5,10,11] },
+  { name:"San Antonio", state:"TX", x:439.5, y:129.3, landscape:['plains'], atmosphere:['culture','history','foodie','family'], style:['city_break'], budget:['budget','mid_range'], months:[3,4,5,10,11] },
+  { name:"Houston", state:"TX", x:490.2, y:135.1, landscape:['plains'], atmosphere:['culture','foodie','nightlife'], style:['city_break'], budget:['mid_range'], months:[3,4,10,11,12] },
+  { name:"Dallas", state:"TX", x:467.5, y:191.7, landscape:['plains'], atmosphere:['culture','nightlife','foodie'], style:['city_break'], budget:['mid_range'], months:[3,4,5,10,11] },
+  { name:"Chicago", state:"IL", x:595.4, y:367.6, landscape:['lakes','plains'], atmosphere:['nightlife','culture','foodie'], style:['city_break'], budget:['mid_range','luxury'], months:[5,6,7,8,9] },
+  { name:"Minneapolis", state:"MN", x:516.0, y:421.8, landscape:['lakes','plains','forest'], atmosphere:['culture','nightlife','foodie'], style:['city_break'], budget:['mid_range'], months:[5,6,7,8,9] },
+  { name:"St. Louis", state:"MO", x:563.7, y:304.4, landscape:['plains','forest'], atmosphere:['culture','history','foodie'], style:['city_break'], budget:['budget','mid_range'], months:[4,5,9,10] },
+  { name:"Kansas City", state:"MO", x:500.4, y:310.9, landscape:['plains'], atmosphere:['culture','foodie','nightlife'], style:['city_break'], budget:['budget','mid_range'], months:[4,5,9,10] },
+  { name:"Detroit", state:"MI", x:657.1, y:383.7, landscape:['lakes'], atmosphere:['culture','history'], style:['city_break'], budget:['budget','mid_range'], months:[5,6,7,8,9] },
+  { name:"Milwaukee", state:"WI", x:589.7, y:389.6, landscape:['lakes'], atmosphere:['nightlife','foodie','culture'], style:['city_break'], budget:['budget','mid_range'], months:[5,6,7,8,9] },
+  { name:"Indianapolis", state:"IN", x:619.7, y:330.6, landscape:['plains'], atmosphere:['culture','family'], style:['city_break'], budget:['budget','mid_range'], months:[4,5,6,9,10] },
+  { name:"Columbus", state:"OH", x:664.0, y:339.6, landscape:['plains','forest'], atmosphere:['culture','foodie','nightlife'], style:['city_break'], budget:['budget','mid_range'], months:[4,5,9,10] },
+  { name:"Cleveland", state:"OH", x:677.9, y:370.9, landscape:['lakes'], atmosphere:['culture','history'], style:['city_break'], budget:['budget','mid_range'], months:[5,6,7,8,9] },
+  { name:"Miami", state:"FL", x:747.3, y:83.2, landscape:['beach','islands'], atmosphere:['nightlife','culture','foodie','romantic'], style:['city_break'], budget:['mid_range','luxury'], months:[11,12,1,2,3,4] },
+  { name:"Orlando", state:"FL", x:719.4, y:130.8, landscape:['beach','lakes'], atmosphere:['family','culture'], style:['city_break'], budget:['mid_range'], months:[11,12,1,2,3,4] },
+  { name:"Tampa", state:"FL", x:703.4, y:117.3, landscape:['beach'], atmosphere:['relaxation','family','foodie'], style:['city_break'], budget:['mid_range'], months:[11,12,1,2,3,4] },
+  { name:"Key West", state:"FL", x:724.0, y:56.7, landscape:['beach','islands'], atmosphere:['relaxation','romantic','nightlife'], style:['city_break','wellness'], budget:['luxury','mid_range'], months:[11,12,1,2,3,4] },
+  { name:"New Orleans", state:"LA", x:575.8, y:141.6, landscape:['plains'], atmosphere:['nightlife','culture','foodie','history'], style:['city_break'], budget:['mid_range'], months:[2,3,4,10,11] },
+  { name:"Nashville", state:"TN", x:617.5, y:262.2, landscape:['forest','plains'], atmosphere:['nightlife','culture','foodie'], style:['city_break'], budget:['mid_range'], months:[4,5,9,10] },
+  { name:"Memphis", state:"TN", x:570.0, y:239.1, landscape:['forest','plains'], atmosphere:['culture','history','nightlife','foodie'], style:['city_break'], budget:['budget','mid_range'], months:[4,5,9,10] },
+  { name:"Atlanta", state:"GA", x:658.5, y:220.8, landscape:['forest','mountains'], atmosphere:['culture','nightlife','foodie'], style:['city_break'], budget:['mid_range'], months:[3,4,5,10,11] },
+  { name:"Charleston", state:"SC", x:729.5, y:212.8, landscape:['beach','forest'], atmosphere:['history','romantic','foodie','culture'], style:['city_break'], budget:['mid_range','luxury'], months:[3,4,5,10,11] },
+  { name:"Savannah", state:"GA", x:713.7, y:196.9, landscape:['forest'], atmosphere:['history','romantic','culture'], style:['city_break'], budget:['mid_range'], months:[3,4,5,10,11] },
+  { name:"Asheville", state:"NC", x:681.8, y:258.5, landscape:['mountains','forest'], atmosphere:['culture','foodie','relaxation','romantic'], style:['road_trip','wellness'], budget:['mid_range'], months:[4,5,6,9,10] },
+  { name:"Charlotte", state:"NC", x:708.3, y:256.0, landscape:['forest','plains'], atmosphere:['culture','foodie','nightlife'], style:['city_break'], budget:['mid_range'], months:[4,5,9,10] },
+  { name:"New York", state:"NY", x:785.9, y:376.6, landscape:['beach','forest'], atmosphere:['culture','nightlife','foodie','romantic','history'], style:['city_break'], budget:['luxury','mid_range'], months:[4,5,6,9,10] },
+  { name:"Philadelphia", state:"PA", x:773.3, y:359.0, landscape:['forest','plains'], atmosphere:['culture','history','foodie','nightlife'], style:['city_break'], budget:['mid_range'], months:[4,5,6,9,10] },
+  { name:"Washington DC", state:"DC", x:751.1, y:334.3, landscape:['forest'], atmosphere:['culture','history','romantic'], style:['city_break'], budget:['mid_range','luxury'], months:[4,5,9,10] },
+  { name:"Baltimore", state:"MD", x:755.7, y:342.5, landscape:['beach','forest'], atmosphere:['culture','history','foodie'], style:['city_break'], budget:['mid_range'], months:[4,5,9,10] },
+  { name:"Boston", state:"MA", x:818.0, y:416.7, landscape:['beach','forest'], atmosphere:['culture','history','foodie','nightlife'], style:['city_break'], budget:['mid_range','luxury'], months:[5,6,7,8,9,10] },
+  { name:"Portland ME", state:"ME", x:822.0, y:443.1, landscape:['beach','forest','mountains'], atmosphere:['foodie','relaxation','romantic'], style:['road_trip'], budget:['mid_range'], months:[6,7,8,9] },
+  { name:"Burlington", state:"VT", x:780.0, y:448.1, landscape:['mountains','forest','lakes'], atmosphere:['relaxation','culture','adventure'], style:['ski','road_trip'], budget:['mid_range'], months:[6,7,8,9,12,1,2] },
+  { name:"Pittsburgh", state:"PA", x:704.5, y:355.0, landscape:['forest','mountains'], atmosphere:['culture','history','foodie'], style:['city_break'], budget:['budget','mid_range'], months:[4,5,9,10] },
+  { name:"Bend", state:"OR", x:145.5, y:448.8, landscape:['mountains','forest','desert'], atmosphere:['adventure','relaxation'], style:['road_trip','ski'], budget:['mid_range'], months:[5,6,7,8,9] },
+  { name:"Honolulu", state:"HI", x:290.5, y:601.9, landscape:['beach','islands','mountains'], atmosphere:['relaxation','culture','adventure','romantic'], style:['wellness','city_break'], budget:['luxury','mid_range'], months:[1,2,3,4,5,6,7,8,9,10,11,12] },
+  { name:"Maui", state:"HI", x:307.7, y:595.6, landscape:['beach','islands','mountains'], atmosphere:['relaxation','romantic','adventure'], style:['wellness'], budget:['luxury'], months:[1,2,3,4,5,6,7,8,9,10,11,12] },
+  { name:"Anchorage", state:"AK", x:135.2, y:562.0, landscape:['mountains','forest'], atmosphere:['adventure'], style:['road_trip','national_parks'], budget:['mid_range'], months:[5,6,7,8,9] },
+  { name:"Fairbanks", state:"AK", x:140.0, y:586.9, landscape:['mountains','forest'], atmosphere:['adventure'], style:['road_trip','national_parks'], budget:['budget','mid_range'], months:[5,6,7,8] },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+const activeMonths = new Set();
+const activeFilters = { landscape:new Set(), atmosphere:new Set(), style:new Set(), budget:new Set() };
+
+// ── MAP INIT ─────────────────────────────────────────────────────────────────
+let cityNodes = null;
+
+async function initMap() {
+  const mapArea = document.getElementById('map-area');
+  const svg = d3.select('#map-svg');
+  const W = mapArea.clientWidth, H = mapArea.clientHeight;
+
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+
+  // Albers USA projection scaled to fit our container
+  const proj = d3.geoAlbersUsa()
+    .scale(W * 1.25)
+    .translate([W / 2, H / 2]);
+
+  const path = d3.geoPath().projection(proj);
+
+  // Graticule
+  const graticule = d3.geoGraticule()();
+  svg.append('path').datum(graticule).attr('class','graticule').attr('d', path);
+
+  // Load TopoJSON
+  let us;
+  try {
+    us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+  } catch(e) {
+    document.getElementById('map-loading').textContent = 'Map tiles failed to load — check your connection.';
+    return;
+  }
+
+  const states = topojson.feature(us, us.objects.states);
+  const nation = topojson.mesh(us, us.objects.states, (a, b) => a === b);
+
+  // Draw states
+  svg.selectAll('.state-path')
+    .data(states.features)
+    .join('path')
+    .attr('class','state-path')
+    .attr('d', path);
+
+  // Nation border
+  svg.append('path').datum(nation).attr('class','nation-border').attr('d', path);
+
+  // City dots — project using same Albers USA
+  // Re-project city lon/lat through d3 projection
+  // We stored x,y from our own math; let's re-project via d3 for accuracy
+  const cityData = CITIES.map(c => {
+    // Original lon/lat lookup — we'll use the projected coords we computed
+    // but re-scale to match the d3 viewport
+    return c;
+  });
+
+  // Reproject using D3 directly with original lon/lat
+  const lonLat = {
+    "Seattle":[-122.33,47.61],"Portland":[-122.68,45.52],"San Francisco":[-122.42,37.77],
+    "Los Angeles":[-118.24,34.05],"San Diego":[-117.16,32.72],"Las Vegas":[-115.14,36.17],
+    "Phoenix":[-112.07,33.45],"Sedona":[-111.76,34.87],"Tucson":[-110.97,32.25],
+    "Santa Fe":[-105.94,35.69],"Albuquerque":[-106.65,35.08],"Denver":[-104.98,39.74],
+    "Aspen":[-106.82,39.19],"Moab":[-109.55,38.57],"Salt Lake City":[-111.89,40.76],
+    "Boise":[-116.20,43.62],"Jackson":[-110.76,43.48],"Billings":[-108.50,45.78],
+    "Austin":[-97.74,30.27],"San Antonio":[-98.49,29.42],"Houston":[-95.37,29.76],
+    "Dallas":[-96.80,32.78],"Chicago":[-87.63,41.85],"Minneapolis":[-93.27,44.98],
+    "St. Louis":[-90.20,38.63],"Kansas City":[-94.58,39.10],"Detroit":[-83.05,42.33],
+    "Milwaukee":[-87.91,43.04],"Indianapolis":[-86.16,39.77],"Columbus":[-82.99,39.96],
+    "Cleveland":[-81.69,41.50],"Miami":[-80.19,25.77],"Orlando":[-81.38,28.54],
+    "Tampa":[-82.46,27.95],"Key West":[-81.78,24.55],"New Orleans":[-90.07,29.95],
+    "Nashville":[-86.78,36.17],"Memphis":[-90.05,35.15],"Atlanta":[-84.39,33.75],
+    "Charleston":[-79.94,32.78],"Savannah":[-81.10,32.08],"Asheville":[-82.55,35.57],
+    "Charlotte":[-80.84,35.23],"New York":[-74.01,40.71],"Philadelphia":[-75.16,39.95],
+    "Washington DC":[-77.04,38.91],"Baltimore":[-76.61,39.29],"Boston":[-71.06,42.36],
+    "Portland ME":[-70.26,43.66],"Burlington":[-73.21,44.48],"Pittsburgh":[-79.99,40.44],
+    "Bend":[-121.31,44.06],"Honolulu":[-157.83,21.31],"Maui":[-156.33,20.80],
+    "Anchorage":[-149.90,61.22],"Fairbanks":[-147.72,64.84],
+  };
+
+  const projectedCities = CITIES.map(c => {
+    const ll = lonLat[c.name];
+    const pt = ll ? proj(ll) : null;
+    return { ...c, px: pt ? pt[0] : null, py: pt ? pt[1] : null };
+  }).filter(c => c.px !== null && c.py !== null);
+
+  // City group
+  const cityG = svg.append('g').attr('class','cities-layer');
+
+  // Pulse rings (for matches)
+  cityG.selectAll('.city-pulse')
+    .data(projectedCities)
+    .join('circle')
+    .attr('class','city-pulse')
+    .attr('cx', d => d.px).attr('cy', d => d.py)
+    .attr('r', 0)
+    .attr('fill', 'rgba(61,140,90,0.15)')
+    .attr('stroke', 'rgba(61,140,90,0.3)')
+    .attr('stroke-width', 1)
+    .attr('pointer-events','none');
+
+  // Dots
+  cityG.selectAll('.city-circle')
+    .data(projectedCities)
+    .join('circle')
+    .attr('class','city-circle')
+    .attr('cx', d => d.px).attr('cy', d => d.py)
+    .attr('r', 4)
+    .attr('fill', '#8aaa8a')
+    .attr('stroke', '#5a8a5a')
+    .attr('stroke-width', 1.1)
+    .on('mouseenter', showTooltip)
+    .on('mousemove', moveTooltip)
+    .on('mouseleave', hideTooltip);
+
+  // Per-city label placement overrides: [dx, dy, anchor]
+  // 'r' = right, 'l' = left, 'c' = center (above/below)
+  const LABEL_OFFSETS = {
+    // Colorado cluster — spread around the dots
+    "Denver":       [7,  -7,  'r'],
+    "Aspen":        [-6, -7,  'l'],
+    // New Mexico cluster
+    "Santa Fe":     [7,  -7,  'r'],
+    "Albuquerque":  [-6,  9,  'l'],
+    // Utah cluster
+    "Moab":         [7,   4,  'r'],
+    "Salt Lake City":[-6, -7, 'l'],
+    // Arizona cluster
+    "Sedona":       [7,  -7,  'r'],
+    "Phoenix":      [7,   4,  'r'],
+    "Tucson":       [7,   4,  'r'],
+    // Nevada
+    "Las Vegas":    [-6, -7,  'l'],
+    // CA coast — nudge up so not stacked
+    "San Francisco":[-6, -7,  'l'],
+    "Los Angeles":  [7,  -7,  'r'],
+    "San Diego":    [7,   4,  'r'],
+    // Wyoming/Idaho/MT
+    "Jackson":      [-6, -7,  'l'],
+    "Billings":     [7,  -7,  'r'],
+    "Boise":        [-6, -7,  'l'],
+    // TX cluster
+    "San Antonio":  [-6,  9,  'l'],
+    "Austin":       [7,  -7,  'r'],
+    "Houston":      [7,   4,  'r'],
+    // Northeast dense cluster
+    "Washington DC":[-6, -7,  'l'],
+    "Baltimore":    [7,   9,  'r'],
+    "Philadelphia": [-6, -7,  'l'],
+    "New York":     [7,  -7,  'r'],
+    "Pittsburgh":   [-6, -7,  'l'],
+    // Carolinas
+    "Charlotte":    [7,  -7,  'r'],
+    "Asheville":    [-6,  9,  'l'],
+    "Charleston":   [7,   4,  'r'],
+    "Savannah":     [-6,  9,  'l'],
+    // FL
+    "Tampa":        [-6, -7,  'l'],
+    "Orlando":      [7,  -7,  'r'],
+    "Key West":     [-6,  9,  'l'],
+    // New England
+    "Burlington":   [-6, -7,  'l'],
+    "Portland ME":  [7,   4,  'r'],
+    // Midwest
+    "Milwaukee":    [-6, -7,  'l'],
+    "Cleveland":    [7,  -7,  'r'],
+    "Detroit":      [7,  -7,  'r'],
+    "Columbus":     [7,   4,  'r'],
+    "Indianapolis": [-6,  9,  'l'],
+    "St. Louis":    [7,  -7,  'r'],
+    "Kansas City":  [-6,  9,  'l'],
+    "Minneapolis":  [-6, -7,  'l'],
+    // Pacific NW
+    "Portland":     [-6, -7,  'l'],
+    "Bend":         [7,   4,  'r'],
+    // HI/AK
+    "Honolulu":     [-6, -7,  'l'],
+    "Maui":         [7,   4,  'r'],
+    "Anchorage":    [7,  -7,  'r'],
+    "Fairbanks":    [7,   4,  'r'],
+  };
+
+  cityG.selectAll('.city-label')
+    .data(projectedCities)
+    .join('text')
+    .attr('class','city-label')
+    .attr('x', d => { const o = LABEL_OFFSETS[d.name]; return d.px + (o ? o[0] : 6); })
+    .attr('y', d => { const o = LABEL_OFFSETS[d.name]; return d.py + (o ? o[1] : 3.5); })
+    .attr('text-anchor', d => {
+      const o = LABEL_OFFSETS[d.name];
+      if (!o) return 'start';
+      return o[2] === 'l' ? 'end' : o[2] === 'c' ? 'middle' : 'start';
+    })
+    .attr('font-size', 8).attr('fill', '#4a5a4a').attr('font-weight','500')
+    .text(d => d.name);
+
+  cityNodes = projectedCities;
+
+  document.getElementById('map-loading').classList.add('done');
+  updateCities();
+}
+
+// ── SCORING ──────────────────────────────────────────────────────────────────
+function hasAnyFilter() {
+  return activeMonths.size > 0 ||
+    Object.values(activeFilters).some(s => s.size > 0);
+}
+
+function scoreCity(city) {
+  const cats = ['landscape','atmosphere','style','budget'];
+  for (const cat of cats) {
+    if (activeFilters[cat].size === 0) continue;
+    if (![...activeFilters[cat]].some(f => city[cat].includes(f))) return 'no_match';
+  }
+  if (activeMonths.size === 0) return 'match';
+  return [...activeMonths].some(m => city.months.includes(m)) ? 'match' : 'wrong_season';
+}
+
+// ── UPDATE CITIES ─────────────────────────────────────────────────────────────
+function updateCities() {
+  if (!cityNodes) return;
+  const hasFilters = hasAnyFilter();
+  document.getElementById('hint').classList.toggle('hidden', hasFilters);
+
+  let matchCount = 0;
+  const svg = d3.select('#map-svg');
+
+  svg.selectAll('.city-circle').each(function(d) {
+    const score = hasFilters ? scoreCity(d) : null;
+    const el = d3.select(this);
+    let fill, stroke, r;
+
+    if (!hasFilters) {
+      fill = '#8aaa8a'; stroke = '#5a8a5a'; r = 4;
+    } else if (score === 'match') {
+      fill = '#3d8c5a'; stroke = '#2a6640'; r = 6; matchCount++;
+    } else if (score === 'wrong_season') {
+      fill = '#c44040'; stroke = '#903030'; r = 5;
+    } else {
+      fill = '#ccc6c0'; stroke = '#aaa49e'; r = 3;
+    }
+    el.attr('fill', fill).attr('stroke', stroke).attr('r', r);
+    d._score = score;
+  });
+
+  // Pulse rings
+  svg.selectAll('.city-pulse').each(function(d) {
+    const el = d3.select(this);
+    el.attr('r', d._score === 'match' ? 10 : 0);
+  });
+
+  // Labels
+  svg.selectAll('.city-label').each(function(d) {
+    const el = d3.select(this);
+    const isMatch = d._score === 'match';
+    const noMatch = d._score === 'no_match';
+    const o = LABEL_OFFSETS[d.name];
+    const baseDx = o ? o[0] : 6;
+    const dx = baseDx > 0 ? baseDx + (isMatch ? 2 : 0) : baseDx - (isMatch ? 2 : 0);
+    const dy = o ? o[1] : 3.5;
+    el.attr('font-size', isMatch ? 9 : 7.5)
+      .attr('font-weight', isMatch ? '700' : '400')
+      .attr('fill', isMatch ? '#1a4a2a' : noMatch ? '#bbb6b0' : '#4a5a4a')
+      .attr('x', d.px + dx)
+      .attr('y', d.py + dy);
+  });
+
+  // Match pill
+  const pill = document.getElementById('match-pill');
+  if (hasFilters) {
+    pill.textContent = `${matchCount} ${matchCount === 1 ? 'match' : 'matches'}`;
+    pill.classList.add('visible');
+  } else {
+    pill.classList.remove('visible');
+  }
+}
+
+// ── TOOLTIP ───────────────────────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function showTooltip(event, d) {
+  document.getElementById('tt-name').textContent = d.name;
+  document.getElementById('tt-state').textContent = d.state;
+
+  const vibesEl = document.getElementById('tt-vibes');
+  vibesEl.innerHTML = '';
+  [...d.landscape, ...d.atmosphere].slice(0,5).forEach(v => {
+    const s = document.createElement('span');
+    s.className = 'tt-vibe'; s.textContent = v.replace('_',' ');
+    vibesEl.appendChild(s);
+  });
+
+  document.getElementById('tt-months').textContent =
+    'Best: ' + d.months.map(m => MONTH_NAMES[m-1]).join(', ');
+
+  const warn = document.getElementById('tt-warn');
+  warn.textContent = d._score === 'wrong_season'
+    ? '⚠ Great vibe match, wrong season' : '';
+
+  moveTooltip(event);
+  tooltip.classList.add('show');
+}
+
+function moveTooltip(event) {
+  const rect = document.getElementById('map-area').getBoundingClientRect();
+  let x = event.clientX - rect.left + 14;
+  let y = event.clientY - rect.top - 14;
+  if (x + 225 > rect.width) x = event.clientX - rect.left - 225;
+  if (y + 130 > rect.height) y = event.clientY - rect.top - 140;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideTooltip() { tooltip.classList.remove('show'); }
+
+// ── UI BUILDERS ───────────────────────────────────────────────────────────────
+function buildMonthGrid() {
+  const grid = document.getElementById('month-grid');
+  MONTHS.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'month-btn';
+    btn.innerHTML = `<span class="month-num">${m.num}</span><span class="month-name">${m.name}</span>`;
+    btn.addEventListener('click', () => {
+      const mo = parseInt(m.num);
+      activeMonths.has(mo) ? activeMonths.delete(mo) : activeMonths.add(mo);
+      btn.classList.toggle('active');
+      updateCities();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function buildGroup(id, cat, items) {
+  const g = document.getElementById(id);
+  items.forEach(item => {
+    const tag = document.createElement('button');
+    tag.className = 'tag';
+    tag.innerHTML = `<span class="icon">${item.icon}</span>${item.label}`;
+    tag.addEventListener('click', () => {
+      activeFilters[cat].has(item.id) ? activeFilters[cat].delete(item.id) : activeFilters[cat].add(item.id);
+      tag.classList.toggle('active');
+      updateCities();
+    });
+    g.appendChild(tag);
+  });
+}
+
+function clearAll() {
+  activeMonths.clear();
+  Object.values(activeFilters).forEach(s => s.clear());
+  document.querySelectorAll('.month-btn.active, .tag.active').forEach(el => el.classList.remove('active'));
+  updateCities();
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+buildMonthGrid();
+buildGroup('landscape-group','landscape',FILTERS.landscape);
+buildGroup('atmosphere-group','atmosphere',FILTERS.atmosphere);
+buildGroup('style-group','style',FILTERS.style);
+buildGroup('budget-group','budget',FILTERS.budget);
+initMap();
+</script>
+</body>
+</html>
