@@ -784,35 +784,40 @@ async function fetchCityImages(cityName) {
   ].filter((q, i, a) => a.indexOf(q) === i); // dedupe queries
 
   try {
-    // Run all searches in parallel
+    // Run all searches in parallel, filtering to images uploaded after 2010
     const searchResults = await Promise.all(queries.map(q =>
-      fetch(`https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srnamespace=6&srlimit=8&format=json&origin=*`)
+      fetch(`https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srnamespace=6&srlimit=8&format=json&origin=*&srstart=2010-01-01T00:00:00Z`)
         .then(r => r.json())
         .then(d => (d.query.search || []).map(r => r.title))
         .catch(() => [])
     ));
 
-    // Flatten, dedupe by title, keep only jpg/png, skip flags/maps/logos
+    // Flatten, dedupe by title, keep only jpg/png, skip flags/maps/logos/old/drawings
     const seen = new Set();
     const titles = searchResults.flat().filter(t => {
       if (seen.has(t)) return false;
       seen.add(t);
       return /\.(jpg|jpeg|png)$/i.test(t) &&
-        !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield|diagram|emblem|tomb|grave|cemetery|headstone|plaque|portrait|sign|mural|wall|interior|indoor|museum_interior|hall|corridor|statue|bust|memorial_wall|inscription/i.test(t);
+        !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield|diagram|emblem|tomb|grave|cemetery|headstone|plaque|portrait|sign|mural|wall|interior|indoor|museum_interior|hall|corridor|statue|bust|memorial_wall|inscription|drawing|sketch|painting|lithograph|engraving|illustration|vintage|historical|circa|bw|black.and.white|monochrome|1[0-9]{3}[^0-9]|19[0-6][0-9]|postcard|archive/i.test(t);
     }).slice(0, 12);
 
     if (titles.length === 0) throw new Error('no results');
 
-    // Fetch all thumb URLs in one batch request
+    // Fetch all thumb URLs in one batch request, also get upload timestamp
     const thumbRes = await fetch(
-      `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.join('|'))}&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*`
+      `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.join('|'))}&prop=imageinfo&iiprop=url|timestamp&iiurlwidth=640&format=json&origin=*`
     );
     const thumbData = await thumbRes.json();
 
-    // Dedupe by thumburl (catches same image under different filenames)
+    // Dedupe by thumburl, also skip images uploaded before 2005
     const urlSeen = new Set();
     const imgs = Object.values(thumbData.query.pages)
-      .filter(p => p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl)
+      .filter(p => {
+        if (!p.imageinfo || !p.imageinfo[0] || !p.imageinfo[0].thumburl) return false;
+        const ts = p.imageinfo[0].timestamp || '';
+        const year = parseInt(ts.slice(0, 4));
+        return !year || year >= 2005;
+      })
       .map(p => p.imageinfo[0].thumburl)
       .filter(url => { if (urlSeen.has(url)) return false; urlSeen.add(url); return true; })
       .slice(0, 4);
