@@ -952,15 +952,13 @@ const CITY_SEARCH_TERMS = {
 async function fetchCityImages(cityName) {
   if (imageCache[cityName]) return imageCache[cityName];
 
-  const searchTerm = CITY_SEARCH_TERMS[cityName] || cityName;
-  const encoded = encodeURIComponent(searchTerm);
+  const searchTerm = encodeURIComponent((CITY_SEARCH_TERMS[cityName] || cityName).split(' ').slice(0, 4).join(','));
 
-  // Generate 4 Unsplash photos using different keywords/orientations for variety
   const imgs = [
-    `https://source.unsplash.com/640x360/?${encoded}`,
-    `https://source.unsplash.com/640x360/?${encodeURIComponent(cityName + ' travel landmark')}`,
-    `https://source.unsplash.com/640x360/?${encodeURIComponent(cityName + ' scenery')}`,
-    `https://source.unsplash.com/640x360/?${encodeURIComponent(cityName + ' cityscape nature')}`,
+    `https://loremflickr.com/640/360/${searchTerm}?random=1`,
+    `https://loremflickr.com/640/360/${searchTerm}?random=2`,
+    `https://loremflickr.com/640/360/${searchTerm}?random=3`,
+    `https://loremflickr.com/640/360/${searchTerm}?random=4`,
   ];
 
   imageCache[cityName] = imgs;
