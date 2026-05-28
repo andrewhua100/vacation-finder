@@ -261,7 +261,7 @@
 <header>
   <div>
     <div class="logo">US <span>Vibe</span> Finder</div>
-    <div class="tagline">Find your perfect destination</div>
+    <div class="tagline">Top 50 vacation spots · Find your perfect destination</div>
   </div>
   <div class="match-pill" id="match-pill">0 matches</div>
 </header>
@@ -385,12 +385,10 @@ const CITIES = [
   { name:"Asheville",       state:"NC", landscape:['mountains','forest'],           atmosphere:['culture','foodie','relaxation','romantic'],          style:['road_trip','wellness'],         budget:['mid_range'],          months:[4,5,6,9,10] },
   { name:"Santa Fe",        state:"NM", landscape:['desert','mountains'],           atmosphere:['culture','history','relaxation','romantic'],         style:['road_trip'],                    budget:['mid_range','luxury'], months:[4,5,6,9,10] },
   { name:"Moab",            state:"UT", landscape:['desert','canyon'],              atmosphere:['adventure'],                                          style:['road_trip','national_parks'],   budget:['budget','mid_range'], months:[3,4,5,9,10,11] },
-  { name:"Jackson",         state:"WY", landscape:['mountains','forest'],           atmosphere:['adventure','relaxation'],                             style:['ski','road_trip','national_parks'], budget:['luxury','mid_range'], months:[6,7,8,12,1,2] },
+  { name:"Jackson Hole",    state:"WY", landscape:['mountains','forest'],           atmosphere:['adventure','relaxation'],                             style:['ski','road_trip','national_parks'], budget:['luxury','mid_range'], months:[6,7,8,12,1,2] },
   { name:"Aspen",           state:"CO", landscape:['mountains','forest'],           atmosphere:['relaxation','adventure','romantic'],                  style:['ski','wellness'],               budget:['luxury'],             months:[12,1,2,3,6,7,8] },
   { name:"Houston",         state:"TX", landscape:['plains'],                       atmosphere:['culture','foodie','nightlife'],                       style:['city_break'],                   budget:['mid_range'],          months:[3,4,10,11,12] },
-  { name:"Dallas",          state:"TX", landscape:['plains'],                       atmosphere:['culture','nightlife','foodie'],                       style:['city_break'],                   budget:['mid_range'],          months:[3,4,5,10,11] },
   { name:"Minneapolis",     state:"MN", landscape:['lakes','plains','forest'],      atmosphere:['culture','nightlife','foodie'],                       style:['city_break'],                   budget:['mid_range'],          months:[5,6,7,8,9] },
-  { name:"Pittsburgh",      state:"PA", landscape:['forest','mountains'],           atmosphere:['culture','history','foodie'],                         style:['city_break'],                   budget:['budget','mid_range'], months:[4,5,9,10] },
   { name:"Salt Lake City",  state:"UT", landscape:['mountains','desert','lakes'],   atmosphere:['adventure','culture'],                                style:['city_break','ski'],             budget:['mid_range'],          months:[4,5,6,7,8,9] },
   { name:"Memphis",         state:"TN", landscape:['forest','plains'],              atmosphere:['culture','history','nightlife','foodie'],             style:['city_break'],                   budget:['budget','mid_range'], months:[4,5,9,10] },
   { name:"Tampa",           state:"FL", landscape:['beach'],                        atmosphere:['relaxation','family','foodie'],                       style:['city_break'],                   budget:['mid_range'],          months:[11,12,1,2,3,4] },
@@ -400,12 +398,15 @@ const CITIES = [
   { name:"Portland ME",     state:"ME", landscape:['beach','forest','mountains'],   atmosphere:['foodie','relaxation','romantic'],                     style:['road_trip'],                    budget:['mid_range'],          months:[6,7,8,9] },
   { name:"Bozeman",         state:"MT", landscape:['mountains','forest','plains'],  atmosphere:['adventure','relaxation'],                             style:['road_trip','ski','national_parks'], budget:['mid_range'],    months:[5,6,7,8,9,12,1,2] },
   { name:"Albuquerque",     state:"NM", landscape:['desert','mountains'],           atmosphere:['culture','history','adventure'],                      style:['road_trip'],                    budget:['budget','mid_range'], months:[4,5,6,9,10] },
-  { name:"Detroit",         state:"MI", landscape:['lakes'],                        atmosphere:['culture','history'],                                  style:['city_break'],                   budget:['budget','mid_range'], months:[5,6,7,8,9] },
-  { name:"Indianapolis",    state:"IN", landscape:['plains'],                       atmosphere:['culture','family'],                                   style:['city_break'],                   budget:['budget','mid_range'], months:[4,5,6,9,10] },
   { name:"Louisville",      state:"KY", landscape:['forest','plains'],              atmosphere:['culture','foodie','nightlife','history'],             style:['city_break'],                   budget:['budget','mid_range'], months:[4,5,9,10] },
   { name:"Bend",            state:"OR", landscape:['mountains','forest','desert'],  atmosphere:['adventure','relaxation'],                             style:['road_trip','ski'],              budget:['mid_range'],          months:[5,6,7,8,9] },
   { name:"Burlington",      state:"VT", landscape:['mountains','forest','lakes'],   atmosphere:['relaxation','culture','adventure'],                   style:['ski','road_trip'],              budget:['mid_range'],          months:[6,7,8,9,12,1,2] },
   { name:"Flagstaff",       state:"AZ", landscape:['mountains','forest','desert'],  atmosphere:['adventure','culture'],                                style:['road_trip','ski'],              budget:['budget','mid_range'], months:[5,6,7,8,9] },
+  { name:"Napa Valley",     state:"CA", landscape:['mountains','forest'],           atmosphere:['relaxation','romantic','foodie','culture'],          style:['wellness','road_trip'],         budget:['luxury','mid_range'], months:[9,10,11] },
+  { name:"Glacier NP",      state:"MT", landscape:['mountains','forest','lakes'],   atmosphere:['adventure','relaxation'],                             style:['national_parks','road_trip'],   budget:['mid_range'],          months:[6,7,8,9] },
+  { name:"Yellowstone",     state:"WY", landscape:['forest','mountains','plains'],  atmosphere:['adventure','family'],                                 style:['national_parks','road_trip'],   budget:['mid_range'],          months:[5,6,7,8,9] },
+  { name:"Scottsdale",      state:"AZ", landscape:['desert','canyon'],              atmosphere:['relaxation','foodie','culture'],                      style:['wellness','city_break'],        budget:['luxury','mid_range'], months:[1,2,3,11,12] },
+  { name:"Carmel",          state:"CA", landscape:['beach','mountains','forest'],   atmosphere:['romantic','relaxation','culture'],                   style:['road_trip','wellness'],         budget:['luxury'],             months:[4,5,6,7,8,9,10] },
 ];
 
 
@@ -440,12 +441,10 @@ const lonLat = {
   "Asheville":      [-82.55, 35.57],
   "Santa Fe":       [-105.94, 35.69],
   "Moab":           [-109.55, 38.57],
-  "Jackson":        [-110.76, 43.48],
+  "Jackson Hole":   [-110.76, 43.48],
   "Aspen":          [-106.82, 39.19],
   "Houston":        [-95.37, 29.76],
-  "Dallas":         [-96.80, 32.78],
   "Minneapolis":    [-93.27, 44.98],
-  "Pittsburgh":     [-79.99, 40.44],
   "Salt Lake City": [-111.89, 40.76],
   "Memphis":        [-90.05, 35.15],
   "Tampa":          [-82.46, 27.95],
@@ -455,12 +454,15 @@ const lonLat = {
   "Portland ME":    [-70.26, 43.66],
   "Bozeman":        [-111.03, 45.68],
   "Albuquerque":    [-106.65, 35.08],
-  "Detroit":        [-83.05, 42.33],
-  "Indianapolis":   [-86.16, 39.77],
   "Louisville":     [-85.76, 38.25],
   "Bend":           [-121.31, 44.06],
   "Burlington":     [-73.21, 44.48],
   "Flagstaff":      [-111.65, 35.20],
+  "Napa Valley":    [-122.30, 38.50],
+  "Glacier NP":     [-113.72, 48.70],
+  "Yellowstone":    [-110.58, 44.60],
+  "Scottsdale":     [-111.89, 33.49],
+  "Carmel":         [-121.92, 36.56],
 };
 
 
@@ -468,59 +470,188 @@ const lonLat = {
 const activeMonths = new Set();
 const activeFilters = { landscape:new Set(), atmosphere:new Set(), style:new Set(), budget:new Set() };
 
-// ── LABEL OFFSETS ─────────────────────────────────────────────────────────────
-const LABEL_OFFSETS = {
-  "New York City":  [7,  -7,  'r'],
-  "Los Angeles":    [7,  -7,  'r'],
-  "Chicago":        [7,  -7,  'r'],
-  "Las Vegas":      [-6, -7,  'l'],
-  "Orlando":        [7,  -7,  'r'],
-  "Miami":          [7,   4,  'r'],
-  "San Francisco":  [-6, -7,  'l'],
-  "Seattle":        [-6, -7,  'l'],
-  "Washington DC":  [-6, -7,  'l'],
-  "Boston":         [7,  -7,  'r'],
-  "New Orleans":    [-6,  9,  'l'],
-  "Nashville":      [7,  -7,  'r'],
-  "Denver":         [7,  -7,  'r'],
-  "San Diego":      [7,   4,  'r'],
-  "Atlanta":        [7,  -7,  'r'],
-  "Austin":         [7,  -7,  'r'],
-  "Honolulu":       [-6, -7,  'l'],
-  "Phoenix":        [7,   4,  'r'],
-  "Philadelphia":   [-6, -7,  'l'],
-  "San Antonio":    [-6,  9,  'l'],
-  "Portland":       [-6, -7,  'l'],
-  "Charleston":     [7,   4,  'r'],
-  "Savannah":       [-6,  9,  'l'],
-  "Key West":       [-6,  9,  'l'],
-  "Maui":           [7,   4,  'r'],
-  "Sedona":         [7,  -7,  'r'],
-  "Asheville":      [-6,  9,  'l'],
-  "Santa Fe":       [7,  -7,  'r'],
-  "Moab":           [7,   4,  'r'],
-  "Jackson":        [-6, -7,  'l'],
-  "Aspen":          [-6, -7,  'l'],
-  "Houston":        [7,   4,  'r'],
-  "Dallas":         [-6, -7,  'l'],
-  "Minneapolis":    [-6, -7,  'l'],
-  "Pittsburgh":     [-6, -7,  'l'],
-  "Salt Lake City": [-6, -7,  'l'],
-  "Memphis":        [-6, -7,  'l'],
-  "Tampa":          [-6, -7,  'l'],
-  "Anchorage":      [7,  -7,  'r'],
-  "St. Louis":      [7,  -7,  'r'],
-  "Kansas City":    [-6,  9,  'l'],
-  "Portland ME":    [7,   4,  'r'],
-  "Bozeman":        [7,  -7,  'r'],
-  "Albuquerque":    [-6,  9,  'l'],
-  "Detroit":        [7,  -7,  'r'],
-  "Indianapolis":   [-6,  9,  'l'],
-  "Louisville":     [7,  -7,  'r'],
-  "Bend":           [7,   4,  'r'],
-  "Burlington":     [-6, -7,  'l'],
-  "Flagstaff":      [7,   4,  'r'],
+// ── LABEL PLACEMENT ───────────────────────────────────────────────────────────
+// Preferred anchor positions (angle in degrees, distance from dot)
+const LABEL_PREFS = {
+  "New York City":  0,    // right
+  "Los Angeles":    135,  // lower-left
+  "Chicago":        0,    // right
+  "Las Vegas":      180,  // left
+  "Orlando":        0,    // right
+  "Miami":          45,   // lower-right
+  "San Francisco":  180,  // left
+  "Seattle":        180,  // left
+  "Washington DC":  180,  // left
+  "Boston":         0,    // right
+  "New Orleans":    270,  // below
+  "Nashville":      315,  // upper-right (away from Memphis left, Atlanta below)
+  "Denver":         0,    // right
+  "San Diego":      180,  // left
+  "Atlanta":        0,    // right
+  "Austin":         270,  // below
+  "Honolulu":       180,  // left
+  "Phoenix":        270,  // below
+  "Philadelphia":   180,  // left
+  "San Antonio":    270,  // below
+  "Portland":       180,  // left
+  "Charleston":     0,    // right
+  "Savannah":       270,  // below
+  "Key West":       180,  // left
+  "Maui":           0,    // right
+  "Sedona":         0,    // right
+  "Asheville":      270,  // below
+  "Santa Fe":       0,    // right
+  "Moab":           0,    // right
+  "Jackson Hole":   180,  // left
+  "Aspen":          180,  // left
+  "Houston":        45,   // lower-right
+  "Minneapolis":    180,  // left
+  "Salt Lake City": 180,  // left
+  "Memphis":        270,  // below (Nashville is NE, St Louis is N)
+  "Tampa":          180,  // left
+  "Anchorage":      0,    // right
+  "St. Louis":      0,    // right
+  "Kansas City":    270,  // below
+  "Portland ME":    0,    // right
+  "Bozeman":        0,    // right
+  "Albuquerque":    270,  // below
+  "Louisville":     45,   // lower-right (Nashville is upper-right, push opposite)
+  "Bend":           180,  // left
+  "Burlington":     0,    // right
+  "Flagstaff":      270,  // below
+  "Napa Valley":    270,  // below
+  "Glacier NP":     0,    // right
+  "Yellowstone":    0,    // right
+  "Scottsdale":     270,  // below
+  "Carmel":         180,  // left
 };
+
+// Compute label positions with robust collision avoidance
+function computeLabelPositions(cities) {
+  const FONT_SIZE = 7.5;   // must match the rendered font-size below
+  const CHAR_WIDTH = 4.4;  // measured: DM Sans 7.5px ≈ 4.4px per char
+  const FONT_HEIGHT = 9;   // line-height at 7.5px
+  const PAD = 2;           // extra breathing room around each box
+  const DOT_R = 8;         // clearance radius around other dots
+
+  // 24 candidate angles, roughly evenly spread, biased toward cardinal directions
+  const BASE_ANGLES = [
+    0, 180, 315, 45, 270, 90, 225, 135,
+    22, 158, 202, 338, 67, 112, 247, 292,
+    11, 169, 191, 349, 79, 101, 259, 281
+  ];
+
+  function getLabelBox(cx, cy, dist, angle, text) {
+    const rad = angle * Math.PI / 180;
+    const w = text.length * CHAR_WIDTH + PAD * 2;
+    const h = FONT_HEIGHT + PAD * 2;
+    const lx = cx + Math.cos(rad) * dist;
+    const ly = cy + Math.sin(rad) * dist;
+
+    let anchor, bx, by;
+    // Right half
+    if (angle <= 45 || angle >= 315) {
+      anchor = 'start';
+      bx = lx - PAD;
+      by = ly - h / 2;
+    }
+    // Left half
+    else if (angle >= 135 && angle <= 225) {
+      anchor = 'end';
+      bx = lx - w + PAD;
+      by = ly - h / 2;
+    }
+    // Bottom
+    else if (angle > 45 && angle < 135) {
+      anchor = 'middle';
+      bx = lx - w / 2;
+      by = ly - PAD;
+    }
+    // Top
+    else {
+      anchor = 'middle';
+      bx = lx - w / 2;
+      by = ly - h + PAD;
+    }
+    return { lx, ly, anchor, bx, by, bw: w, bh: h, dist };
+  }
+
+  function boxesOverlap(a, b) {
+    const gap = 1;
+    return !(a.bx + a.bw + gap < b.bx ||
+             b.bx + b.bw + gap < a.bx ||
+             a.by + a.bh + gap < b.by ||
+             b.by + b.bh + gap < a.by);
+  }
+
+  function boxOverlapsDot(box, cx, cy) {
+    const closestX = Math.max(box.bx, Math.min(cx, box.bx + box.bw));
+    const closestY = Math.max(box.by, Math.min(cy, box.by + box.bh));
+    const dx = cx - closestX, dy = cy - closestY;
+    return dx * dx + dy * dy < DOT_R * DOT_R;
+  }
+
+  const placed = [];
+
+  for (const city of cities) {
+    const prefAngle = LABEL_PREFS[city.name] !== undefined ? LABEL_PREFS[city.name] : 0;
+
+    // Build ordered angle list: preferred first, then the rest
+    const angles = [prefAngle, ...BASE_ANGLES.filter(a => a !== prefAngle)];
+
+    // Try: for each angle (preference order), sweep distances close→far.
+    // This means preferred direction wins even if it needs more distance,
+    // rather than a bad angle winning just because it's close.
+    const distances = [10, 13, 17, 22, 28, 35, 44, 55];
+
+    let bestBox = null;
+
+    // First pass: try preferred angle at all distances, then other angles at all distances
+    for (const angle of angles) {
+      for (const dist of distances) {
+        const box = getLabelBox(city.px, city.py, dist, angle, city.name);
+
+        let bad = false;
+        for (const p of placed) {
+          if (boxesOverlap(box, p.box)) { bad = true; break; }
+        }
+        if (bad) continue;
+
+        for (const c of cities) {
+          if (c === city) continue;
+          if (boxOverlapsDot(box, c.px, c.py)) { bad = true; break; }
+        }
+        if (bad) continue;
+
+        bestBox = box;
+        break;
+      }
+      if (bestBox) break;
+    }
+
+    // Hard fallback: minimum-overlap position (prefer preferred angle, shortest dist)
+    if (!bestBox) {
+      let minOverlapCount = Infinity;
+      for (const dist of [10, 13, 17, 22, 28, 35]) {
+        for (const angle of angles) {
+          const box = getLabelBox(city.px, city.py, dist, angle, city.name);
+          let overlapCount = 0;
+          for (const p of placed) { if (boxesOverlap(box, p.box)) overlapCount++; }
+          for (const c of cities) { if (c !== city && boxOverlapsDot(box, c.px, c.py)) overlapCount++; }
+          if (overlapCount < minOverlapCount) { minOverlapCount = overlapCount; bestBox = box; }
+          if (overlapCount === 0) break;
+        }
+        if (minOverlapCount === 0) break;
+      }
+    }
+
+    const lbl = { city, lx: bestBox.lx, ly: bestBox.ly, anchor: bestBox.anchor, box: bestBox };
+    city._label = lbl;
+    placed.push(lbl);
+  }
+
+  return placed;
+}
 
 
 // ── MAP INIT ─────────────────────────────────────────────────────────────────
@@ -604,20 +735,54 @@ async function initMap() {
     .on('mousemove', moveTooltip)
     .on('mouseleave', hideTooltip);
 
-  // Labels
+  // Labels with collision avoidance
+  const labelPlacements = computeLabelPositions(projectedCities);
+
+  // Store placement data on each city for updateCities
+  labelPlacements.forEach(lbl => { lbl.city._label = lbl; });
+
+  // Leader lines (drawn below labels, only when label is pushed far)
+  cityG.selectAll('.city-leader')
+    .data(labelPlacements)
+    .join('line')
+    .attr('class','city-leader')
+    .attr('x1', d => d.city.px)
+    .attr('y1', d => d.city.py)
+    .attr('x2', d => d.lx)
+    .attr('y2', d => d.ly)
+    .attr('stroke', '#8aaa8a')
+    .attr('stroke-width', 0.6)
+    .attr('opacity', d => d.box.dist > 14 ? 0.55 : 0)
+    .attr('pointer-events','none');
+
+  // White halo for readability
+  cityG.selectAll('.city-label-halo')
+    .data(labelPlacements)
+    .join('text')
+    .attr('class','city-label-halo')
+    .attr('x', d => d.lx)
+    .attr('y', d => d.ly)
+    .attr('text-anchor', d => d.anchor)
+    .attr('dominant-baseline', 'middle')
+    .attr('font-size', 7.5).attr('font-weight','600')
+    .attr('stroke', 'rgba(242,237,227,0.95)').attr('stroke-width', 3.5)
+    .attr('stroke-linejoin', 'round')
+    .attr('fill', 'none')
+    .attr('pointer-events','none')
+    .text(d => d.city.name);
+
+  // Actual label text
   cityG.selectAll('.city-label')
-    .data(projectedCities)
+    .data(labelPlacements)
     .join('text')
     .attr('class','city-label')
-    .attr('x', d => { const o = LABEL_OFFSETS[d.name]; return d.px + (o ? o[0] : 6); })
-    .attr('y', d => { const o = LABEL_OFFSETS[d.name]; return d.py + (o ? o[1] : 3.5); })
-    .attr('text-anchor', d => {
-      const o = LABEL_OFFSETS[d.name];
-      if (!o) return 'start';
-      return o[2] === 'l' ? 'end' : o[2] === 'c' ? 'middle' : 'start';
-    })
-    .attr('font-size', 8).attr('fill', '#4a5a4a').attr('font-weight','500')
-    .text(d => d.name);
+    .attr('x', d => d.lx)
+    .attr('y', d => d.ly)
+    .attr('text-anchor', d => d.anchor)
+    .attr('dominant-baseline', 'middle')
+    .attr('font-size', 7.5).attr('fill', '#2e3d2e').attr('font-weight','500')
+    .attr('pointer-events','none')
+    .text(d => d.city.name);
 
   cityNodes = projectedCities;
 
@@ -696,19 +861,25 @@ function updateCities() {
     el.attr('r', d._score === 'match' ? 10 : 0);
   });
 
-  svg.selectAll('.city-label').each(function(d) {
+  svg.selectAll('.city-label, .city-label-halo').each(function(d) {
     const el = d3.select(this);
-    const isMatch = d._score === 'match';
-    const noMatch = d._score === 'no_match';
-    const o = LABEL_OFFSETS[d.name];
-    const baseDx = o ? o[0] : 6;
-    const dx = baseDx > 0 ? baseDx + (isMatch ? 2 : 0) : baseDx - (isMatch ? 2 : 0);
-    const dy = o ? o[1] : 3.5;
+    const city = d.city || d; // handle both placements and direct city data
+    const isMatch = city._score === 'match';
+    const noMatch = city._score === 'no_match';
+    const isHalo = d3.select(this).classed('city-label-halo');
     el.attr('font-size', isMatch ? 9 : 7.5)
-      .attr('font-weight', isMatch ? '700' : '400')
-      .attr('fill', isMatch ? '#1a4a2a' : noMatch ? '#bbb6b0' : '#4a5a4a')
-      .attr('x', d.px + dx)
-      .attr('y', d.py + dy);
+      .attr('font-weight', isMatch ? '700' : '500');
+    if (!isHalo) {
+      el.attr('fill', isMatch ? '#1a4a2a' : noMatch ? '#c0bbb5' : '#3a4a3a');
+    }
+  });
+
+  svg.selectAll('.city-leader').each(function(d) {
+    const city = d.city;
+    const isMatch = city._score === 'match';
+    const noMatch = city._score === 'no_match';
+    d3.select(this).attr('stroke', isMatch ? '#2a6640' : noMatch ? '#ccc6c0' : '#8aaa8a')
+      .attr('opacity', noMatch ? 0.25 : 0.5);
   });
 
   const pill = document.getElementById('match-pill');
@@ -753,12 +924,10 @@ const CITY_SEARCH_TERMS = {
   "Asheville":      "Asheville North Carolina Blue Ridge Parkway mountains",
   "Santa Fe":       "Santa Fe New Mexico adobe architecture plaza",
   "Moab":           "Moab Utah Arches National Park red rock canyon",
-  "Jackson":        "Jackson Hole Wyoming Grand Teton mountains snow",
+  "Jackson Hole":   "Jackson Hole Wyoming Grand Teton mountains snow",
   "Aspen":          "Aspen Colorado ski slopes snow mountains",
   "Houston":        "Houston Texas skyline downtown cityscape",
-  "Dallas":         "Dallas Texas skyline Reunion Tower downtown",
   "Minneapolis":    "Minneapolis skyline Stone Arch Bridge lakes",
-  "Pittsburgh":     "Pittsburgh skyline three rivers Point State Park",
   "Salt Lake City": "Salt Lake City Utah skyline Wasatch Mountains",
   "Memphis":        "Memphis Tennessee Beale Street Mississippi River",
   "Tampa":          "Tampa Bay beach sunset Florida coast",
@@ -768,12 +937,15 @@ const CITY_SEARCH_TERMS = {
   "Portland ME":    "Portland Maine lighthouse rocky coast",
   "Bozeman":        "Bozeman Montana Bridger Mountains Yellowstone",
   "Albuquerque":    "Albuquerque hot air balloon fiesta desert",
-  "Detroit":        "Detroit Michigan skyline river Renaissance Center",
-  "Indianapolis":   "Indianapolis Motor Speedway skyline downtown",
   "Louisville":     "Louisville Kentucky Churchill Downs horse racing bourbon",
   "Bend":           "Bend Oregon Smith Rock Cascade Mountains",
   "Burlington":     "Burlington Vermont Lake Champlain waterfront foliage",
   "Flagstaff":      "Flagstaff Arizona Grand Canyon ponderosa pine mountains",
+  "Napa Valley":    "Napa Valley California vineyard wine country rolling hills",
+  "Glacier NP":     "Glacier National Park Montana mountains lake reflection",
+  "Yellowstone":    "Yellowstone National Park geyser bison wildlife",
+  "Scottsdale":     "Scottsdale Arizona desert resort spa luxury",
+  "Carmel":         "Carmel by the Sea California coastal village beach",
 };
 
 
@@ -930,13 +1102,29 @@ function showTooltip(event, d) {
 }
 
 function moveTooltip(event) {
-  const rect = document.getElementById('map-area').getBoundingClientRect();
-  let x = event.clientX - rect.left + 14;
-  let y = event.clientY - rect.top - 14;
-  if (x + 250 > rect.width) x = event.clientX - rect.left - 255;
-  if (y + 320 > rect.height) y = event.clientY - rect.top - 320;
+  const mapRect = document.getElementById('map-area').getBoundingClientRect();
+  const TOOLTIP_W = 240;
+  // Measure actual height; if not yet rendered, use a safe fallback
+  const TOOLTIP_H = tooltip.offsetHeight > 50 ? tooltip.offsetHeight : 310;
+  const OFFSET = 16;
+  const MARGIN = 8;
+
+  const cx = event.clientX - mapRect.left;
+  const cy = event.clientY - mapRect.top;
+
+  // Prefer right of cursor, flip left if overflow
+  let x = cx + OFFSET;
+  if (x + TOOLTIP_W + MARGIN > mapRect.width) x = cx - TOOLTIP_W - OFFSET;
+  x = Math.max(MARGIN, Math.min(x, mapRect.width - TOOLTIP_W - MARGIN));
+
+  // Prefer above cursor, drop below if overflow top
+  let y = cy - TOOLTIP_H - OFFSET;
+  if (y < MARGIN) y = cy + OFFSET;
+  // If that still overflows bottom, pin to bottom margin
+  y = Math.max(MARGIN, Math.min(y, mapRect.height - TOOLTIP_H - MARGIN));
+
   tooltip.style.left = x + 'px';
-  tooltip.style.top = y + 'px';
+  tooltip.style.top  = y + 'px';
 }
 
 function hideTooltip() {
