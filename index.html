@@ -405,8 +405,7 @@ const CITIES = [
   { name:"Napa Valley",     state:"CA", landscape:['mountains','forest'],           atmosphere:['relaxation','romantic','foodie','culture'],          style:['wellness','road_trip'],         budget:['luxury','mid_range'], months:[9,10,11] },
   { name:"Glacier NP",      state:"MT", landscape:['mountains','forest','lakes'],   atmosphere:['adventure','relaxation'],                             style:['national_parks','road_trip'],   budget:['mid_range'],          months:[6,7,8,9] },
   { name:"Yellowstone",     state:"WY", landscape:['forest','mountains','plains'],  atmosphere:['adventure','family'],                                 style:['national_parks','road_trip'],   budget:['mid_range'],          months:[5,6,7,8,9] },
-  { name:"Scottsdale",      state:"AZ", landscape:['desert','canyon'],              atmosphere:['relaxation','foodie','culture'],                      style:['wellness','city_break'],        budget:['luxury','mid_range'], months:[1,2,3,11,12] },
-  { name:"Carmel",          state:"CA", landscape:['beach','mountains','forest'],   atmosphere:['romantic','relaxation','culture'],                   style:['road_trip','wellness'],         budget:['luxury'],             months:[4,5,6,7,8,9,10] },
+  { name:"Yosemite",        state:"CA", landscape:['mountains','forest','lakes'],   atmosphere:['adventure','relaxation','romantic'],                  style:['national_parks','road_trip'],   budget:['mid_range'],          months:[4,5,6,7,8,9,10] },
 ];
 
 
@@ -461,8 +460,7 @@ const lonLat = {
   "Napa Valley":    [-122.30, 38.50],
   "Glacier NP":     [-113.72, 48.70],
   "Yellowstone":    [-110.58, 44.60],
-  "Scottsdale":     [-111.89, 33.49],
-  "Carmel":         [-121.92, 36.56],
+  "Yosemite":       [-119.54, 37.86],
 };
 
 
@@ -522,8 +520,7 @@ const LABEL_PREFS = {
   "Napa Valley":    270,  // below
   "Glacier NP":     0,    // right
   "Yellowstone":    0,    // right
-  "Scottsdale":     270,  // below
-  "Carmel":         180,  // left
+  "Yosemite":       180,  // left
 };
 
 // Compute label positions with robust collision avoidance
@@ -949,19 +946,62 @@ const CITY_SEARCH_TERMS = {
 };
 
 
+const CITY_PHOTOS = {
+  "New York City":  ["https://plus.unsplash.com/premium_photo-1661954654458-c673671d4a08?w=2000&auto=format&fit=crop&q=60"],
+  "Los Angeles":    ["https://images.unsplash.com/photo-1597982087634-9884f03198ce?w=2000&auto=format&fit=crop&q=60"],
+  "Chicago":        ["https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=2000&auto=format&fit=crop&q=60"],
+  "Las Vegas":      ["https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?w=2000&auto=format&fit=crop&q=60"],
+  "Orlando":        ["https://images.unsplash.com/photo-1605723517503-3cadb5818a0c?w=2000&auto=format&fit=crop&q=60"],
+  "Miami":          ["https://images.unsplash.com/photo-1589083130544-0d6a2926e519?w=2000&auto=format&fit=crop&q=60"],
+  "San Francisco":  ["https://plus.unsplash.com/premium_photo-1673002094407-a72547fa791a?w=2000&auto=format&fit=crop&q=60"],
+  "Seattle":        ["https://images.unsplash.com/photo-1589481169991-40ee02888551?w=2000&auto=format&fit=crop&q=60"],
+  "Washington DC":  ["https://images.unsplash.com/photo-1617581629397-a72507c3de9e?w=2000&auto=format&fit=crop&q=60"],
+  "Boston":         ["https://images.unsplash.com/photo-1573524949339-b830334a31ee?w=2000&auto=format&fit=crop&q=60"],
+  "New Orleans":    ["https://images.unsplash.com/photo-1640583442212-51283693be7f?w=2000&auto=format&fit=crop&q=60"],
+  "Nashville":      ["https://images.unsplash.com/photo-1556033681-83abea291a96?w=2000&auto=format&fit=crop&q=60"],
+  "Denver":         ["https://images.unsplash.com/photo-1602800458591-eddda28a498b?w=2000&auto=format&fit=crop&q=60"],
+  "San Diego":      ["https://plus.unsplash.com/premium_photo-1697730155844-40e94785d1e1?w=2000&auto=format&fit=crop&q=60"],
+  "Atlanta":        ["https://images.unsplash.com/photo-1473042904451-00171c69419d?w=2000&auto=format&fit=crop&q=60"],
+  "Austin":         ["https://images.unsplash.com/photo-1530089711124-9ca31fb9e863?w=2000&auto=format&fit=crop&q=60"],
+  "Honolulu":       ["https://images.unsplash.com/photo-1507876466758-bc54f384809c?w=2000&auto=format&fit=crop&q=60"],
+  "Phoenix":        ["https://images.unsplash.com/photo-1706403222567-06fe8d8dc93e?w=2000&auto=format&fit=crop&q=60"],
+  "Philadelphia":   ["https://images.unsplash.com/photo-1544295699-624f04212074?w=2000&auto=format&fit=crop&q=60"],
+  "San Antonio":    ["https://images.unsplash.com/photo-1514510249063-e0faf6c6ec0c?w=2000&auto=format&fit=crop&q=60"],
+  "Portland":       ["https://images.unsplash.com/photo-1635209896150-ef275dbd52a2?w=2000&auto=format&fit=crop&q=60"],
+  "Charleston":     ["https://images.unsplash.com/photo-1623608103487-3953899aff0b?w=2000&auto=format&fit=crop&q=60"],
+  "Savannah":       ["https://images.unsplash.com/photo-1592663283246-c843227611ce?w=2000&auto=format&fit=crop&q=60"],
+  "Key West":       ["https://images.unsplash.com/photo-1709304225457-dc3f846cb2ed?w=2000&auto=format&fit=crop&q=60"],
+  "Maui":           ["https://images.unsplash.com/photo-1547537069-537b37a02069?w=2000&auto=format&fit=crop&q=60"],
+  "Sedona":         ["https://images.unsplash.com/photo-1579408795979-966a21467a34?w=2000&auto=format&fit=crop&q=60"],
+  "Asheville":      ["https://images.unsplash.com/photo-1732646117345-593b37ccdea6?w=2000&auto=format&fit=crop&q=60"],
+  "Santa Fe":       ["https://images.unsplash.com/photo-1731699579486-98fc30cbfb6a?w=2000&auto=format&fit=crop&q=60"],
+  "Moab":           ["https://images.unsplash.com/photo-1543682388-4b46a14c91db?w=2000&auto=format&fit=crop&q=60"],
+  "Jackson Hole":   ["https://images.unsplash.com/photo-1595131264251-63b7cf3b8564?w=2000&auto=format&fit=crop&q=60"],
+  "Aspen":          ["https://images.unsplash.com/photo-1581278968429-f3bc2a29a1dc?w=2000&auto=format&fit=crop&q=60"],
+  "Houston":        ["https://images.unsplash.com/photo-1692154600992-463fa9b27abd?w=2000&auto=format&fit=crop&q=60"],
+  "Minneapolis":    ["https://images.unsplash.com/photo-1535082049017-5a7b43f3bcef?w=2000&auto=format&fit=crop&q=60"],
+  "Salt Lake City": ["https://plus.unsplash.com/premium_photo-1697730209415-559500330536?w=2000&auto=format&fit=crop&q=60"],
+  "Memphis":        ["https://plus.unsplash.com/premium_photo-1733306451268-8358184c380f?w=2000&auto=format&fit=crop&q=60"],
+  "Tampa":          ["https://plus.unsplash.com/premium_photo-1697729928006-a09ae953d150?w=2000&auto=format&fit=crop&q=60"],
+  "Anchorage":      ["https://images.unsplash.com/photo-1608462364345-fc83addce32d?w=2000&auto=format&fit=crop&q=60"],
+  "St. Louis":      ["https://images.unsplash.com/photo-1675906798393-89cbae461520?w=2000&auto=format&fit=crop&q=60"],
+  "Kansas City":    ["https://images.unsplash.com/photo-1536622638768-9403a9d35a1a?w=2000&auto=format&fit=crop&q=60"],
+  "Portland ME":    ["https://images.unsplash.com/photo-1665998395404-5b4da44728d3?w=2000&auto=format&fit=crop&q=60"],
+  "Bozeman":        ["https://images.unsplash.com/photo-1608768557474-d4c5651d3230?w=2000&auto=format&fit=crop&q=60"],
+  "Albuquerque":    ["https://plus.unsplash.com/premium_photo-1674160595163-58c9bf85323f?w=2000&auto=format&fit=crop&q=60"],
+  "Louisville":     ["https://images.unsplash.com/photo-1628559787883-943086f88d9a?w=2000&auto=format&fit=crop&q=60"],
+  "Bend":           ["https://images.unsplash.com/photo-1626827318571-483bf9df4d64?w=2000&auto=format&fit=crop&q=60"],
+  "Burlington":     ["https://images.unsplash.com/photo-1737038934032-027964b14a0d?w=2000&auto=format&fit=crop&q=60"],
+  "Flagstaff":      ["https://images.unsplash.com/photo-1722900746638-869a1509f1c9?w=2000&auto=format&fit=crop&q=60"],
+  "Napa Valley":    ["https://images.unsplash.com/photo-1471882243907-ba1cf91b79ef?w=2000&auto=format&fit=crop&q=60"],
+  "Glacier NP":     ["https://images.unsplash.com/photo-1552751753-0fc84ae5b6c8?w=2000&auto=format&fit=crop&q=60"],
+  "Yellowstone":    ["https://images.unsplash.com/photo-1529439322271-42931c09bce1?w=2000&auto=format&fit=crop&q=60"],
+  "Yosemite":       ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=2000&auto=format&fit=crop&q=60"],
+};
+
 async function fetchCityImages(cityName) {
   if (imageCache[cityName]) return imageCache[cityName];
-
-  const base = (CITY_SEARCH_TERMS[cityName] || cityName).split(' ').slice(0, 4).join(',');
-  const searchTerm = encodeURIComponent(base + ',landscape,scenery,outdoors');
-
-  const imgs = [
-    `https://loremflickr.com/640/360/${searchTerm}?random=1`,
-    `https://loremflickr.com/640/360/${searchTerm}?random=2`,
-    `https://loremflickr.com/640/360/${searchTerm}?random=3`,
-    `https://loremflickr.com/640/360/${searchTerm}?random=4`,
-  ];
-
+  const imgs = CITY_PHOTOS[cityName] || ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=2000&auto=format&fit=crop&q=60"];
   imageCache[cityName] = imgs;
   return imgs;
 }
