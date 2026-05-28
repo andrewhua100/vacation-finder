@@ -952,73 +952,19 @@ const CITY_SEARCH_TERMS = {
 async function fetchCityImages(cityName) {
   if (imageCache[cityName]) return imageCache[cityName];
 
-  // Find this city's tags to build targeted queries
-  const cityData = CITIES.find(c => c.name === cityName);
-  const tags = cityData ? [...cityData.landscape, ...cityData.atmosphere] : [];
+  const searchTerm = CITY_SEARCH_TERMS[cityName] || cityName;
+  const encoded = encodeURIComponent(searchTerm);
 
-  // Build 3 searches: city alone, city + top landscape tag, city + top atmosphere tag
-  const base = CITY_SEARCH_TERMS[cityName] || cityName;
-  const landscapeKw = tags.slice(0, 2).map(t => TAG_KEYWORDS[t] || t).join(' ');
-  const queries = [
-    base,
-    `${cityName} ${TAG_KEYWORDS[tags[0]] || ''}`.trim(),
-    `${cityName} ${TAG_KEYWORDS[tags[1]] || ''}`.trim(),
-  ].filter((q, i, a) => a.indexOf(q) === i); // dedupe queries
-
-  try {
-    // Run all searches in parallel, filtering to images uploaded after 2010
-    const searchResults = await Promise.all(queries.map(q =>
-      fetch(`https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srnamespace=6&srlimit=8&format=json&origin=*&srstart=2010-01-01T00:00:00Z`)
-        .then(r => r.json())
-        .then(d => (d.query.search || []).map(r => r.title))
-        .catch(() => [])
-    ));
-
-    // Flatten, dedupe by title, keep only jpg/png, skip flags/maps/logos/old/drawings
-    const seen = new Set();
-    const titles = searchResults.flat().filter(t => {
-      if (seen.has(t)) return false;
-      seen.add(t);
-      return /\.(jpg|jpeg|png)$/i.test(t) &&
-        !/flag|seal|logo|map|locator|icon|blank|coa|coat|shield|diagram|emblem|tomb|grave|cemetery|headstone|plaque|portrait|sign|mural|wall|interior|indoor|museum_interior|hall|corridor|statue|bust|memorial_wall|inscription|drawing|sketch|painting|lithograph|engraving|illustration|vintage|historical|circa|bw|black.and.white|monochrome|1[0-9]{3}[^0-9]|19[0-6][0-9]|postcard|archive/i.test(t);
-    }).slice(0, 12);
-
-    if (titles.length === 0) throw new Error('no results');
-
-    // Fetch all thumb URLs in one batch request, also get upload timestamp
-    const thumbRes = await fetch(
-      `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles.join('|'))}&prop=imageinfo&iiprop=url|timestamp&iiurlwidth=640&format=json&origin=*`
-    );
-    const thumbData = await thumbRes.json();
-
-    // Dedupe by thumburl, also skip images uploaded before 2005
-    const urlSeen = new Set();
-    const imgs = Object.values(thumbData.query.pages)
-      .filter(p => {
-        if (!p.imageinfo || !p.imageinfo[0] || !p.imageinfo[0].thumburl) return false;
-        const ts = p.imageinfo[0].timestamp || '';
-        const year = parseInt(ts.slice(0, 4));
-        return !year || year >= 2005;
-      })
-      .map(p => p.imageinfo[0].thumburl)
-      .filter(url => { if (urlSeen.has(url)) return false; urlSeen.add(url); return true; })
-      .slice(0, 4);
-
-    if (imgs.length >= 2) {
-      imageCache[cityName] = imgs;
-      return imgs;
-    }
-  } catch(e) {}
-
-  // Fallback: picsum
-  const seed = encodeURIComponent(cityName);
-  const fallback = [
-    `https://picsum.photos/seed/${seed}a/640/360`,
-    `https://picsum.photos/seed/${seed}b/640/360`,
-    `https://picsum.photos/seed/${seed}c/640/360`,
+  // Generate 4 Unsplash photos using different keywords/orientations for variety
+  const imgs = [
+    `https://source.unsplash.com/640x360/?${encoded}`,
+    `https://source.unsplash.com/640x360/?${encodeURIComponent(cityName + ' travel landmark')}`,
+    `https://source.unsplash.com/640x360/?${encodeURIComponent(cityName + ' scenery')}`,
+    `https://source.unsplash.com/640x360/?${encodeURIComponent(cityName + ' cityscape nature')}`,
   ];
-  imageCache[cityName] = fallback;
-  return fallback;
+
+  imageCache[cityName] = imgs;
+  return imgs;
 }
 
 // ── SLIDESHOW STATE ───────────────────────────────────────────────────────────
