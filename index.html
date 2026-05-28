@@ -952,7 +952,8 @@ const CITY_SEARCH_TERMS = {
 async function fetchCityImages(cityName) {
   if (imageCache[cityName]) return imageCache[cityName];
 
-  const searchTerm = encodeURIComponent((CITY_SEARCH_TERMS[cityName] || cityName).split(' ').slice(0, 4).join(','));
+  const base = (CITY_SEARCH_TERMS[cityName] || cityName).split(' ').slice(0, 4).join(',');
+  const searchTerm = encodeURIComponent(base + ',landscape,scenery,outdoors');
 
   const imgs = [
     `https://loremflickr.com/640/360/${searchTerm}?random=1`,
